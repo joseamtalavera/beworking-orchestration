@@ -1,0 +1,34 @@
+services:
+  beworking-backend:
+    build:
+      context: ./beworking-backend-java
+    container_name: beworking-backend-java
+    ports:
+      - "8080:8080"
+    environment:
+      # point at the existing DB container on the shared network:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/lhm_inmo_app
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      default:
+        aliases:
+          - db    # so “db” → your old lhm_inmo_app-db-1 container
+
+  beworking-frontend:
+    build:
+      context: ./beworking-frontend
+    container_name: beworking-frontend
+    ports:
+      - "3020:3000"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://backend:8080/api
+    networks:
+      - default
+
+networks:
+  default:
+    external: true
+    # replace this with the actual network name you saw for your lhm_inmo_app compose:
+    name: lhm_inmo_app_default
