@@ -1,13 +1,13 @@
 services:
   beworking-backend:
     build:
-      context: ./beworking-backend-java
+      context: ../beworking-backend-java
     container_name: beworking-backend-java
     ports:
       - "8080:8080"
     environment:
       # point at the existing DB container on the shared network:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/lhm_inmo_app
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mydatabase
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
@@ -18,7 +18,7 @@ services:
 
   beworking-frontend:
     build:
-      context: ./beworking-frontend
+      context: ../beworking-frontend
     container_name: beworking-frontend
     ports:
       - "3020:3000"
