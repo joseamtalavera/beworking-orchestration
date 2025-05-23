@@ -2,6 +2,7 @@ services:
   beworking-backend:
     build:
       context: ../beworking-backend-java
+      dockerfile: Dockerfile.dev
     container_name: beworking-backend-java
     ports:
       - "8080:8080"
@@ -16,8 +17,10 @@ services:
       - ../beworking-backend-java/pom.xml:/app/pom.xml
       - ../beworking-backend-java/mvnw:/app/mvnw
       - ../beworking-backend-java/mvnw.cmd:/app/mvnw.cmd
+      - ~/.m2:/root/.m2
+
     working_dir: /app
-    command: ./mvnw spring-boot:run
+    command: ./mvnw -Dspring.devtools.restart.enabled=true spring-boot:run
     networks:
       - default
     depends_on:
