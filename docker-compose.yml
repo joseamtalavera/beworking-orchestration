@@ -33,7 +33,10 @@ services:
     ports:
       - "3020:3000"
     environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:8080/api
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+    volumes:
+      - ../beworking-frontend:/app
+    command: npm run dev
     networks:
       - default
 
