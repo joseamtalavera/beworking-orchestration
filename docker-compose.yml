@@ -1,3 +1,10 @@
+# ---
+# JWT Secret Management Steps (for reference, remove before production)
+# 1. Generate a strong secret using:
+#    openssl rand -base64 48
+# 2. Set the secret below for local/dev (never commit real secrets to public repos)
+# 3. For production, inject via environment variable or secret manager, not in this file.
+# ---
 services:
   beworking-backend:
     build:
@@ -11,7 +18,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - JWT_SECRET=your_jwt_secret
+      - JWT_SECRET=WXyIkMklk7IDB0N05ujAKtw8JI+LWO4yhRQBOJ7rDpeGmRMPVQosrd8njfvkRqvj  # Step 2: Set your generated secret here
     volumes:
       - ../beworking-backend-java/src:/app/src
       - ../beworking-backend-java/target:/app/target
