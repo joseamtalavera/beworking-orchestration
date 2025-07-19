@@ -26,6 +26,8 @@ services:
       - ../beworking-backend-java/mvnw:/app/mvnw
       - ../beworking-backend-java/mvnw.cmd:/app/mvnw.cmd
       - ~/.m2:/root/.m2
+      - ../beworking-backend-java/src/main/resources:/app/src/main/resources
+
 
     working_dir: /app
     command: ./mvnw -Dspring.devtools.restart.enabled=true spring-boot:run
