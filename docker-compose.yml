@@ -56,8 +56,8 @@ services:
       POSTGRES_DB: mydatabase
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    # ports:
-    #   - "5432:5432"
+    ports:
+      - "5433:5432"
     volumes:
       - pgdata_beworking:/var/lib/postgresql/data
     networks:
