@@ -1,0 +1,79 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.0.6 Chrome/138.0.7204.100 Electron/37.2.3 Safari/537.36" version="28.0.6">
+  <diagram name="Registration Process (expanded)" id="GqoC_IhSjbOkKc_pNDZs">
+    <mxGraphModel dx="2305" dy="859" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="2336" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-1" value="User / Client (POST /api/register)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="200" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-2" value="RegistrationController" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="290" y="200" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-3" value="Validate DTO (@Valid)\nChecks: name, email, password, phone" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="590" y="110" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-4" value="RegistrationService\n(business rules)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f7ff;strokeColor=#4da6ff;" vertex="1" parent="1">
+          <mxGeometry x="900" y="200" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-5" value="Password hashing (BCrypt)\nAssign default roles" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1434" y="200" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-6" value="User Entity" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1434" y="300" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-7" value="Database (users table)" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1880" y="370" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-8" value="Publish UserRegisteredEvent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f4f4f4;strokeColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="260" y="650" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-9" value="Email Verification Listener\n(sends verification email with token)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c9daf8;strokeColor=#3c78d8;" vertex="1" parent="1">
+          <mxGeometry x="620" y="370" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-10" value="Welcome Flow Listener\n(assign initial onboarding tasks)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d9ead3;strokeColor=#38761d;" vertex="1" parent="1">
+          <mxGeometry x="980" y="710" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-11" value="Verification Token Table\n(user_id, token, expires_at)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="1840" y="550" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-12" value="Error response (400/422)\nReturn validation errors" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebeb;strokeColor=#d9534f;" vertex="1" parent="1">
+          <mxGeometry x="290" y="20" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-14" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-1" target="Kb9psYwksk9-t4l_66Q_-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-15" value="POST body -&gt; RegistrationRequest" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-2" target="Kb9psYwksk9-t4l_66Q_-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-16" value="if valid -&gt; call service" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-3" target="Kb9psYwksk9-t4l_66Q_-4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-17" value="hash password, assign roles" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-4" target="Kb9psYwksk9-t4l_66Q_-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-18" value="map -&gt; entity" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-5" target="Kb9psYwksk9-t4l_66Q_-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-19" value="save" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-6" target="Kb9psYwksk9-t4l_66Q_-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-20" value="publish (AFTER_COMMIT)" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-7" target="Kb9psYwksk9-t4l_66Q_-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-21" value="async -&gt; send verification email" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;strokeColor=#3c78d8;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-8" target="Kb9psYwksk9-t4l_66Q_-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-22" value="async -&gt; onboarding tasks" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;strokeColor=#38761d;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-8" target="Kb9psYwksk9-t4l_66Q_-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-23" value="store token" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-9" target="Kb9psYwksk9-t4l_66Q_-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Kb9psYwksk9-t4l_66Q_-24" value="on validation error" style="edgeStyle=elbowEdgeStyle;endArrow=block;html=1;strokeColor=#d9534f;" edge="1" parent="1" source="Kb9psYwksk9-t4l_66Q_-3" target="Kb9psYwksk9-t4l_66Q_-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
