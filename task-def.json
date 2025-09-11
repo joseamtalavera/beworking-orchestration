@@ -1,0 +1,63 @@
+{
+	"family": "beworking-backend-task",
+	"networkMode": "awsvpc",
+	"requiresCompatibilities": [
+		"FARGATE"
+	],
+	"cpu": "512",
+	"memory": "3072",
+	"executionRoleArn": "arn:aws:iam::905418223611:role/ecsTaskExecutionRole",
+	"containerDefinitions": [
+		{
+			"name": "beworking-backend",
+			"image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-core:main",
+			"essential": true,
+			"portMappings": [
+				{
+					"containerPort": 8080,
+					"protocol": "tcp"
+				}
+			],
+			"environment": [
+				{
+					"name": "SPRING_PROFILES_ACTIVE",
+					"value": "prod"
+				},
+				{
+					"name": "DB_URL",
+					"value": "jdbc:postgresql://database-2.c50syq0iyqal.eu-north-1.rds.amazonaws.com:5432/mydatabase"
+				}
+			],
+			"secrets": [
+				{
+					"name": "DB_USERNAME",
+					"valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-db-credentials:username::"
+				},
+				{
+					"name": "DB_PASSWORD",
+					"valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-db-credentials:password::"
+				},
+				{
+					"name": "JWT_SECRET",
+					"valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-jwt-secret-KQsoD8:JWT_SECRET::"
+				},
+				{
+					"name": "HUBSPOT_API_TOKEN",
+					"valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-hubspot-token"
+				}
+			],
+			"logConfiguration": {
+				"logDriver": "awslogs",
+				"options": {
+					"awslogs-group": "/ecs/beworking-backend-task",
+					"awslogs-region": "eu-north-1",
+					"awslogs-stream-prefix": "ecs"
+				}
+			}
+		}
+	],
+	"runtimePlatform": {
+		"cpuArchitecture": "X86_64",
+		"operatingSystemFamily": "LINUX"
+	}
+}
