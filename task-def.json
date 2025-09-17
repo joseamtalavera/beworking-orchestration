@@ -43,7 +43,7 @@
         },
         {
           "name": "HUBSPOT_API_TOKEN",
-          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-hubspot-token-PY2ggr"
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-hubspot-token-PY2ggr:HUBSPOT_API_TOKEN::"
         }
       ],
       "logConfiguration": {
