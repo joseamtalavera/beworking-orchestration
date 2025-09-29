@@ -1,4 +1,5 @@
 {
+  "taskRoleArn": "arn:aws:iam::905418223611:role/beworking-ecs-task-role",
   "family": "beworking-backend-task",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [

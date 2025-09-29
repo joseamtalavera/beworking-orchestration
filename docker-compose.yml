@@ -20,6 +20,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - JWT_SECRET=WXyIkMklk7IDB0N05ujAKtw8JI+LWO4yhRQBOJ7rDpeGmRMPVQosrd8njfvkRqvj  # Step 2: Set your generated secret here
+      - APP_CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3020
     volumes:
       - ../beworking-backend-java/src:/app/src
       - ../beworking-backend-java/target:/app/target
@@ -45,11 +46,32 @@ services:
       - "3020:3000"
     environment:
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+      NEXT_PUBLIC_ADMIN_DASHBOARD_URL: http://localhost:5173/admin
+      NEXT_PUBLIC_USER_DASHBOARD_URL: http://localhost:5173/user
     volumes:
       - ../beworking-frontend:/app
     command: npm run dev
     networks:
       - default
+
+  beworking-dashboard:
+    build:
+      context: ../beworking-dashboard
+      dockerfile: Dockerfile.dev
+    container_name: beworking-dashboard
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8080/api
+      - VITE_LOGIN_URL=http://localhost:3020/main/login
+    volumes:
+      - ../beworking-dashboard:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    networks:
+      - default
+    depends_on:
+      - beworking-backend
 
   db:
     image: postgres:13-alpine
