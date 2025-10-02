@@ -1,37 +1,57 @@
 # Mailbox Process
 - **Owner:** _TBD_
-- **Last updated:** 2025-10-01
+- **Last updated:** 2025-10-02
 
 ## Purpose
-Explain how tenant users access, consume, and manage in-app messages or notifications within the mailbox module.
+Describe how tenant users browse and interact with mailbox threads, how the frontend components coordinate with backend services, and how messages persist and fan out to downstream channels.
 
-## High-Level Flow
-1. Fetch mailbox threads/messages for the authenticated user.
-2. Present mailbox UI (list view, detail view, unread counters).
-3. Handle user actions (mark read/unread, archive, respond, trigger workflows).
-4. Sync changes back to backend services and notify other participants.
+## Frontend Components
+1. **MailboxPage (/mailbox)** – layout shell that wires Redux/React Query providers, loads initial metadata, and mounts child components.
+2. **MailboxList** – fetches paginated threads via `GET /api/mailbox/threads`, renders unread counts, and surfaces selection events.
+3. **MailboxThread** – loads the active conversation with `GET /api/mailbox/threads/<built-in function id>`, handles scrolling, and marks messages as read.
+4. **MailboxComposer** – validates input, applies tenant templates, and posts new replies through `POST /api/mailbox/messages`.
+5. **NotificationBadge** – subscribes to WebSocket/STOMP updates to refresh counts in real time.
 
-Extend the flow with any automation (e.g. email forwarding, push notifications, SLA reminders).
+All components share a mailbox store slice so state (selected thread, message cache, composer draft) stays consistent between views.
 
-## Systems & Services
-- Frontend: mailbox components, real-time updates, state synchronisation.
-- Backend: mailbox APIs, notification queue/workers, persistence.
-- Integrations: external email gateway, chat service, CRM updates.
+## Request Flow
+1. User hits `/mailbox`; `MailboxPage` requests thread summaries (list component).
+2. Selecting a thread triggers `MailboxThread` to fetch full history and mark messages read.
+3. Sending a reply posts to `POST /api/mailbox/messages`; the UI optimistically appends the outbound message.
+4. WebSocket notifications increment unread counters across other sessions via `NotificationBadge`.
 
-Link to concrete files once mapped (e.g. `beworking-backend-java/.../MailboxController`).
+## Backend Components
+- **MailboxController** – exposes REST endpoints for listing threads, fetching individual conversations, sending replies, and marking read state.
+- **MailboxService** – orchestrates business rules (tenant scoping, permissions, push notifications, audit logging).
+- **MailboxThreadRepository / MailboxMessageRepository** – Spring Data JPA repositories for persistence.
+- **NotificationService** – wraps async messaging (publishes events to WebSocket gateway and optional email relay).
+- **WebSocketGateway** – STOMP/SockJS endpoint broadcasting message and unread updates to subscribed clients.
+
+## Persistence & Integrations
+- **PostgreSQL tables**: `mailbox_thread` stores thread metadata; `mailbox_message` holds individual messages plus sender/attachments.
+- **External relay** (optional): NotificationService can hand off emails to an SMTP relay for external participants.
 
 ## Diagram
 - Source: `../../diagrams/draw.mailbox.txt`
-- Export (PNG/SVG): `../../diagrams/mailbox.drawio.png`
-
-Embed export when ready:
+- Export: `../../diagrams/mailbox.drawio.png`
 
 ![Mailbox flow](../../diagrams/mailbox.drawio.png)
 
-## Key Decisions & Notes
-- Document retention policies, tenant segregation, permission checks.
-- Capture open questions around scalability, notifications, or analytics.
+## Sequence Details
+1. `MailboxList` → `MailboxController.listThreads()` → `MailboxService.fetchThreads()` → `MailboxThreadRepository` → `mailbox_thread`.
+2. `MailboxThread` → `MailboxController.threadDetail(id)` → `MailboxService.fetchThread(id)` → repositories → return DTO for UI.
+3. `MailboxComposer` → `MailboxController.createMessage()` → `MailboxService.createMessage()` which:
+   - Persists via `MailboxMessageRepository`.
+   - Updates thread metadata (last message, unread counts).
+   - Emits `MailboxMessageCreatedEvent` consumed by `NotificationService`.
+4. `NotificationService` pushes payload to `WebSocketGateway`; connected clients update their state. Optional: send email relay to off-platform recipients.
+
+## Error Handling
+- Controller validates tenant access; unauthorized users receive 403.
+- Service layer wraps repository exceptions into domain-specific errors (e.g., thread archived, attachment too large).
+- WebSocket disconnects trigger re-authentication on the frontend badge component.
 
 ## Follow-ups
-- [ ] Verify real-time update path (websocket/polling).
-- [ ] Document failure handling and retries.
+- [ ] Generate and commit `docs/diagrams/mailbox.drawio.png` after updating the draw.io diagram.
+- [ ] Expand NotificationService documentation with retry/backoff strategy.
+- [ ] Add integration tests covering WebSocket unread updates.

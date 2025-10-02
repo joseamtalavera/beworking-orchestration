@@ -85,6 +85,16 @@ services:
       - ~/.m2:/root/.m2
 ```
 
+
+### Optional: Standalone Build & Run
+If you want to build and run the container without Compose:
+```bash
+./mvnw clean package -DskipTests
+docker build -t beworking-backend-java .
+docker run -p 8080:8080 --env-file .env --name beworking-backend beworking-backend-java
+```
+Visit `http://localhost:8080` (curl or Postman) to verify the service. Use `Ctrl+C` or `docker stop beworking-backend` to exit.
+
 ## Step 5 — Rebuild and Start Containers
 
 ```bash
@@ -136,3 +146,22 @@ Look for an entry starting with `./mvnw`.
 | New code served | Subsequent HTTP requests use updated implementation |
 
 Use a full rebuild (`docker compose up --build`) if you change dependencies or Docker configuration.
+
+## Step 9 — Recover from Compilation Issues
+If hot reload gets stuck or classes are out of sync, rebuild on the host and restart the container:
+```bash
+cd ~/Coding/Coding_Projects/20-Multi_tenant/beworking_tenant/beworking-backend-java
+./mvnw clean compile
+
+cd ~/Coding/Coding_Projects/20-Multi_tenant/beworking_tenant/beworking-orchestration
+docker compose restart beworking-backend
+```
+This rebuilds all classes (e.g. `WebConfig`), syncs them through the mounted volume, and restarts the container with fresh bytecode.
+
+## Step 10 — Clean Up Docker Space
+Periodically prune unused images and volumes to reclaim disk space:
+```bash
+docker system prune -a --volumes
+docker system prune -a -f --volumes
+```
+Use with care—this removes all dangling resources on your machine.

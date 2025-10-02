@@ -1,4 +1,5 @@
 # Authentication & Security Playbook
+
 - **Owner:** _TBD_
 - **Last updated:** 2025-10-01
 
@@ -8,19 +9,24 @@ Use this guide whenever you need to review or reimplement the Beworking authenti
 
 ## 1. Password Security
 
-### Current Implementation
+### Existing CSRF Implementation
+
 - Password hashing handled via Spring's `PasswordEncoder` (BCrypt) in `RegisterService.java`.
 - Frontend components (`SigninCard.js`, `ResetPassword.js`) validate inputs with `validateInputs()` but the backend remains authoritative.
 
-### How to Reapply
+### Steps to Reapply (JWT Security)
+
 1. Define a `PasswordEncoder` bean (usually in `SecurityConfig`):
+
    ```java
    @Bean
    public PasswordEncoder passwordEncoder() {
        return new BCryptPasswordEncoder();
    }
    ```
+
 2. Hash raw passwords before persistence:
+
    ```java
    // RegisterService.java
    public void register(RegisterRequest request) {
@@ -31,33 +37,41 @@ Use this guide whenever you need to review or reimplement the Beworking authenti
        userRepository.save(user);
    }
    ```
+
 3. Align backend validation rules (see Section 6) with frontend UX hints so users receive consistent messaging.
 
 ---
 
 ## 2. JWT Security
 
-### Current Implementation
+### Session Management Implementation
+
 - `JWT_SECRET` provided via environment variables (`docker-compose.yml` for local dev, secret manager in production).
 - `application.properties` loads the secret with `jwt.secret=${JWT_SECRET}`.
 - `JwtUtil.java` injects the secret using `@Value`, signs tokens with HS256, and verifies signatures on all requests.
 
 ### How to Reapply
+
 1. Generate a strong secret: `openssl rand -base64 48`.
 2. Inject it via environment variables. Example compose snippet:
+
    ```yaml
    services:
      beworking-backend:
        environment:
          JWT_SECRET: ${JWT_SECRET:-change-me}
    ```
+
 3. Reference it in `application.properties`:
+
    ```properties
    # application.properties
    # Injected from env; do not hardcode secrets here
    jwt.secret=${JWT_SECRET}
    ```
+
 4. Use the secret in `JwtUtil.java`:
+
    ```java
    @Component
    public class JwtUtil {
@@ -88,23 +102,29 @@ Use this guide whenever you need to review or reimplement the Beworking authenti
        }
    }
    ```
+
 5. Ensure the JWT filter verifies signatures using the same key for every request.
 
 ---
 
 ## 3. Session Management & Token Expiration
 
-### Current Implementation
+### Existing Rate Limiting Implementation
+
 - Stateless authentication—no server-side sessions.
 - `JwtUtil.java` sets a 1-hour lifetime and the JWT library rejects expired tokens automatically.
 
-### How to Reapply
+### Steps to Reapply
+
 1. Configure the expiration constant:
+
    ```java
    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
    ```
+
 2. Apply the expiration when generating tokens (see code above).
 3. Handle expiration in the filter:
+
    ```java
    try {
        Jws<Claims> claims = jwtUtil.parseToken(token);
@@ -114,6 +134,7 @@ Use this guide whenever you need to review or reimplement the Beworking authenti
        return;
    }
    ```
+
 4. Consider refresh tokens if product requirements demand longer sessions.
 
 ---
@@ -121,9 +142,11 @@ Use this guide whenever you need to review or reimplement the Beworking authenti
 ## 4. CORS Configuration
 
 ### Current Implementation
+
 - `SecurityConfig` restricts origins to known frontend hosts and only whitelists required methods/headers.
 
 ### How to Reapply
+
 1. Declare a `CorsConfigurationSource` bean:
    ```java
    @Bean
@@ -147,7 +170,7 @@ Use this guide whenever you need to review or reimplement the Beworking authenti
 
 ## 5. CSRF Protection
 
-### Current Implementation
+### Existing CSRF Implementation
 - CSRF disabled for stateless APIs using Authorization headers.
 
 ### How to Reapply

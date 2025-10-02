@@ -7,6 +7,9 @@ This folder centralises product and technical documentation that spans the front
 - `diagrams/` – source files (`.drawio`) and lightweight exports (`.png`/`.svg`) referenced from the process docs.
 - `installation/` – end-to-end setup guides for local, QA, or production environments.
 - `security/` – authentication hardening checklists and security best practices.
+- `seo/` – search engine optimisation playbooks and frontend guidance.
+- `testing/` – unit, integration, contract, and E2E testing playbooks.
+- `deployment/` – infrastructure runbooks and CI/CD workflows.
 
 ## Process Index
 | Process | Summary | Notes |
@@ -34,3 +37,26 @@ See [Working with Draw.io](WORKING_WITH_DRAWIO.md) for CLI tips and automation o
 | Topic | Notes |
 | --- | --- |
 | Authentication Hardening | [Checklist](security/README.md) |
+
+## SEO Guides
+| Topic | Notes |
+| --- | --- |
+| Frontend SEO | [Playbook](seo/README.md) |
+
+## Testing Guides
+| Topic | Notes |
+| --- | --- |
+| Backend & End-to-End Testing | [Playbook](testing/README.md) |
+| Frontend Jest Setup | [Guide](testing/frontend-jest.md) |
+
+## Deployment Guides
+| Topic | Notes |
+| --- | --- |
+| Backend on AWS ECS | [Runbook](deployment/backend-aws.md) |
+| Application Profiles | [Runbook](deployment/application-properties.md) |
+| AWS Secrets Manager | [Setup](deployment/aws-secrets-manager.md) |
+| ECS Secrets (DDBB, JWT, HubSpot) | [Process](deployment/ecs-secrets-ddbb-integration.md) |
+| Backend Rebuild Workflow | [Guide](deployment/backend-rebuild.md) |
+| RDS Connectivity Checklist | [Guide](deployment/rds-connectivity-checklist.md) |
+| Frontend Docker Workflow | [Guide](deployment/frontend-docker.md) |
+| Backend Docker Workflow | [Guide](deployment/backend-docker.md) |
