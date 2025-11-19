@@ -2,7 +2,16 @@
 
 This folder centralises product and technical documentation that spans the frontend, backend, and orchestration services. Use it as the jump-off point for understanding key end-to-end flows and the diagrams that support them.
 
+## 📚 Documentation Overview
+
+For a complete guide to our documentation strategy, see [Comprehensive Documentation Plan](COMPREHENSIVE_DOCUMENTATION_PLAN.md).
+
 ## Structure
+- `api/` – Complete API documentation with OpenAPI/Swagger specifications
+- `architecture/` – System architecture, components, and design patterns
+- `components/` – Detailed documentation for each module and component
+- `database/` – Database schema, migrations, and entity relationships
+- `development/` – Development guides, coding standards, and workflows
 - `processes/` – narrative documentation for each business or technical process.
 - `diagrams/` – source files (`.drawio`) and lightweight exports (`.png`/`.svg`) referenced from the process docs.
 - `installation/` – end-to-end setup guides for local, QA, or production environments.
@@ -10,6 +19,7 @@ This folder centralises product and technical documentation that spans the front
 - `seo/` – search engine optimisation playbooks and frontend guidance.
 - `testing/` – unit, integration, contract, and E2E testing playbooks.
 - `deployment/` – infrastructure runbooks and CI/CD workflows.
+- `troubleshooting/` – Common issues, error codes, and solutions
 
 ## Process Index
 | Process | Summary | Notes |
@@ -48,6 +58,33 @@ See [Working with Draw.io](WORKING_WITH_DRAWIO.md) for CLI tips and automation o
 | --- | --- |
 | Backend & End-to-End Testing | [Playbook](testing/README.md) |
 | Frontend Jest Setup | [Guide](testing/frontend-jest.md) |
+
+## API Documentation
+| Topic | Notes |
+| --- | --- |
+| API Overview | [Complete API Reference](api/README.md) |
+| Authentication APIs | [Auth Endpoints](api/authentication.md) |
+| Booking APIs | [Booking Endpoints](api/bookings.md) |
+| Interactive Swagger UI | Available at `http://localhost:8080/swagger-ui.html` when backend is running |
+
+## Architecture Documentation
+| Topic | Notes |
+| --- | --- |
+| System Overview | [Architecture Overview](architecture/overview.md) |
+| Components | [Component Architecture](architecture/components.md) |
+| Data Flow | [Data Flow Diagrams](architecture/data-flow.md) |
+
+## Database Documentation
+| Topic | Notes |
+| --- | --- |
+| Database Schema | [Complete Schema Reference](database/schema.md) |
+| Migrations | [Migration History](database/migrations/) |
+
+## Development Guides
+| Topic | Notes |
+| --- | --- |
+| Coding Standards | [Code Style and Documentation Guidelines](development/coding-standards.md) |
+| Setup Guide | [Development Setup](installation/README.md) |
 
 ## Deployment Guides
 | Topic | Notes |
