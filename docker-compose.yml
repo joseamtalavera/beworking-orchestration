@@ -29,6 +29,7 @@ services:
       - ../beworking-backend-java/mvnw.cmd:/app/mvnw.cmd
       - ~/.m2:/root/.m2
       - ../beworking-backend-java/src/main/resources:/app/src/main/resources
+      - ../beworking-backend-java/uploads:/app/uploads
 
 
     working_dir: /app
