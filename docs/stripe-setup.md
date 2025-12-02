@@ -2,29 +2,29 @@
 
 End-to-end flow: booking frontend uses Stripe Elements to collect payment; backend must create a PaymentIntent and return the `clientSecret`. Below are the steps for future developers to set up and verify the integration.
 
-## Frontend (beworking-booking)
-- Dependencies (already in package.json): `@stripe/stripe-js`, `@stripe/react-stripe-js`.
-- Env: set `VITE_STRIPE_PUBLISHABLE_KEY` (e.g., in `.env` or docker compose).
-- Flow (BookingFlowPage):
-  1) On the payment step, call `POST /api/public/payment-intents` with `{ amount (cents), currency, productName, centerCode, contact? }`.
-  2) Receive `{ clientSecret }`, wrap the step in `<Elements clientSecret=... stripe=loadStripe(VITE_STRIPE_PUBLISHABLE_KEY)>`, render `<PaymentElement />`.
-  3) “Pay now” calls `stripe.confirmPayment(...)`.
-- Pricing: Tarifa is read-only and comes from the selected producto `priceFrom`; Centro/Product are filtered from public lookups.
-
-## Backend (beworking-backend-java)
-- Add Stripe SDK to `pom.xml`:
-  ```xml
-  <dependency>
-    <groupId>com.stripe</groupId>
-    <artifactId>stripe-java</artifactId>
-    <version>24.10.0</version>
-  </dependency>
-  ```
-- Env: set `STRIPE_SECRET_KEY`.
-- Endpoint to implement: `POST /api/public/payment-intents`
-  - Input: `{ amount: long (cents), currency: string, productName: string, centerCode?: string, contact?: { name, email } }`
-  - Logic: `Stripe.apiKey = STRIPE_SECRET_KEY`; create `PaymentIntent` with amount/currency; add metadata (productName, centerCode, contact); return `{ clientSecret }`.
-  - Return: `201` or `200` with `{ clientSecret }`.
+## Step-by-step (current state)
+1) Frontend deps installed (beworking-booking `package.json`): `@stripe/stripe-js`, `@stripe/react-stripe-js`.
+2) Backend dep added (beworking-backend-java `pom.xml`):
+   ```xml
+   <dependency>
+     <groupId>com.stripe</groupId>
+     <artifactId>stripe-java</artifactId>
+     <version>24.20.0</version>
+   </dependency>
+   ```
+3) Config placeholders:
+   - Backend: add `stripe.secret=${STRIPE_SECRET_KEY:}` to `application.properties` (or profile files) or set env `STRIPE_SECRET_KEY`.
+   - Frontend: set `VITE_STRIPE_PUBLISHABLE_KEY` in `.env`/compose.
+4) Backend endpoint implemented: `POST /api/public/payment-intents` (`PublicPaymentController`).
+   - Request body (`PaymentIntentRequest`): `amount` (cents, Long), `currency`, `productName`, optional `centerCode`, `contactName`, `contactEmail`.
+   - Logic: validate amount/currency, set `Stripe.apiKey` from `stripe.secret`, create `PaymentIntent` with metadata, return `{ clientSecret }`.
+   - Errors: 400 for bad input, 500 if key missing, 502 on Stripe errors.
+5) Restart backend after setting `stripe.secret` so the key loads.
+6) Frontend payment UI wiring is pending re-enable: on payment step call the endpoint, wrap with `<Elements clientSecret=... stripe=loadStripe(VITE_STRIPE_PUBLISHABLE_KEY)>`, render `<PaymentElement />`, and call `stripe.confirmPayment(...)`.
+7) Orchestration setup (Docker Compose):
+   - In `beworking-orchestration`, set `STRIPE_SECRET_KEY=sk_test_...` in a local `.env` (create it if missing; kept out of git).
+   - `docker-compose.yml` already passes `STRIPE_SECRET_KEY` to the backend service.
+   - Rebuild/restart backend: `docker-compose up -d --build beworking-backend`.
 
 ## Deployment / Config
 - Backend: `STRIPE_SECRET_KEY`
@@ -38,6 +38,6 @@ End-to-end flow: booking frontend uses Stripe Elements to collect payment; backe
 4) Verify PaymentIntent status in Stripe dashboard; update booking status accordingly (to be implemented server-side).
 
 ## Status / TODO
-- Frontend wiring: PaymentElement + confirmPayment in place.
-- Backend endpoint: **to be implemented** (`/api/public/payment-intents`).
+- Backend endpoint: implemented (`/api/public/payment-intents`).
+- Frontend wiring: PaymentElement + confirmPayment needs to be re-enabled.
 - Booking status update on successful payment: **to be implemented**.
