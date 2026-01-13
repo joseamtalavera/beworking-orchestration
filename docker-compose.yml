@@ -20,8 +20,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - JWT_SECRET=WXyIkMklk7IDB0N05ujAKtw8JI+LWO4yhRQBOJ7rDpeGmRMPVQosrd8njfvkRqvj  # Step 2: Set your generated secret here
-      - APP_CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3020,http://localhost:4173
+      - APP_CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:3020,http://localhost:4173
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}  # Provide sk_test... in your env/compose overrides
+      - TURNSTILE_SECRET=${TURNSTILE_SECRET:-}
     volumes:
       - ../beworking-backend-java/src:/app/src
       - ../beworking-backend-java/target:/app/target
