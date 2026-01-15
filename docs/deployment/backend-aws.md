@@ -119,7 +119,7 @@ Example JSON snippet:
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/beworking-backend",
+          "awslogs-group": "/ecs/beworking-backend-task",
           "awslogs-region": "eu-north-1",
           "awslogs-stream-prefix": "ecs"
         }
@@ -135,7 +135,7 @@ Register via console or `aws ecs register-task-definition`.
 ## 4. ECS Service & Networking
 
 ### 4.1 Service Configuration
-- Service name: `beworking-backend-service`
+- Service name: `beworking-backend-task-service-v2xrc5id`
 - Cluster: `beworking-cluster`
 - Task definition: `beworking-backend-task:1`
 - Desired tasks: 1 (scale later as needed)
@@ -154,10 +154,10 @@ Register via console or `aws ecs register-task-definition`.
 - Application Load Balancer (public subnets)
 - Listener: HTTP 80 (or HTTPS 443 once ACM cert issued)
 - Target group: Fargate tasks on port 8080
-- Health check path: `/actuator/health`
+- Health check path: `/api/health`
 
 ### 4.4 Route53
-- Create record: `api.beworking.com` → ALB DNS name (alias record).
+- Create record: `<TODO-api-domain>` → ALB DNS name (alias record).
 
 > Initial deployment exposed the task via public IP (`13.51.249.97:8080`) for validation. Transition to ALB once DNS and certificates are ready.
 
@@ -190,7 +190,7 @@ Register via console or `aws ecs register-task-definition`.
 1. On push to main:
    - Build JAR and Docker image.
    - Push image to ECR (`beworking-core:main`).
-   - Run `aws ecs update-service --cluster beworking-cluster --service beworking-backend-service --force-new-deployment`.
+   - Run `aws ecs update-service --cluster beworking-cluster --service beworking-backend-task-service-v2xrc5id --force-new-deployment`.
 
 ### 7.2 Frontend Workflow (for reference)
 1. On push:
@@ -201,7 +201,7 @@ Register via console or `aws ecs register-task-definition`.
 ---
 
 ## 8. Observability & Logging
-- **CloudWatch Logs** capture container stdout/stderr (`/ecs/beworking-backend`).
+- **CloudWatch Logs** capture container stdout/stderr (`/ecs/beworking-backend-task`).
 - **CloudWatch Metrics & Alarms:** monitor CPU utilisation, memory, 5xx responses, and target health.
 - Optional: enable CloudFront access logs (if frontend uses CloudFront) and store in S3.
 - Consider integrating AWS X-Ray or custom metrics for deeper tracing.
@@ -210,7 +210,7 @@ Register via console or `aws ecs register-task-definition`.
 
 ## 9. Post-Deployment Validation
 1. Confirm ECS task has status `RUNNING` in `beworking-cluster`.
-2. Hit `/actuator/health` via ALB DNS or public IP to confirm 200 status.
+2. Hit `/api/health` via ALB DNS or public IP to confirm 200 status.
 3. Exercise `/api/auth/login` with valid credentials (requires DB connectivity/seeding).
 4. Inspect CloudWatch logs for warnings/errors.
 

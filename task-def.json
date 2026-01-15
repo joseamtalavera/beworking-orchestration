@@ -27,6 +27,10 @@
         {
           "name": "SPRING_PROFILES_ACTIVE",
           "value": "prod"
+        },
+        {
+          "name": "APP_CORS_ALLOWED_ORIGINS",
+          "value": "https://be-working.com,https://www.be-working.com,https://oficinavirtual.be-working.com"
         }
       ],
       "secrets": [
@@ -45,6 +49,10 @@
         {
           "name": "HUBSPOT_API_TOKEN",
           "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-hubspot-token-PY2ggr:HUBSPOT_API_TOKEN::"
+        },
+        {
+          "name": "TURNSTILE_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-turnstile-secret-dI7LJl"
         }
       ],
       "logConfiguration": {
