@@ -1,0 +1,124 @@
+services:
+  beworking-backend:
+    build:
+      context: ../beworking-backend-java
+      dockerfile: Dockerfile
+    container_name: beworking-backend
+    expose:
+      - "8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_URL=${DB_URL}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - HUBSPOT_API_TOKEN=${HUBSPOT_API_TOKEN:-}
+      - TURNSTILE_SECRET=${TURNSTILE_SECRET:-}
+      - APP_CORS_ALLOWED_ORIGINS=${APP_CORS_ALLOWED_ORIGINS:-https://be-working.com,https://www.be-working.com,https://oficinavirtual.be-working.com}
+      - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - APP_BASE_URL=${APP_BASE_URL:-https://be-working.com}
+      - APP_FRONTEND_URL=${APP_FRONTEND_URL:-https://oficinavirtual.be-working.com}
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - default
+
+  beworking-frontend:
+    build:
+      context: ../beworking-frontend
+      dockerfile: Dockerfile
+    container_name: beworking-frontend
+    expose:
+      - "3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-/api}
+      - NEXT_PUBLIC_ADMIN_DASHBOARD_URL=${NEXT_PUBLIC_ADMIN_DASHBOARD_URL:-/dashboard/admin}
+      - NEXT_PUBLIC_USER_DASHBOARD_URL=${NEXT_PUBLIC_USER_DASHBOARD_URL:-/dashboard/user}
+      - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY:-}
+    restart: unless-stopped
+    networks:
+      - default
+
+  beworking-dashboard:
+    build:
+      context: ../beworking-dashboard
+      dockerfile: Dockerfile
+    container_name: beworking-dashboard
+    expose:
+      - "80"
+    environment:
+      - VITE_API_BASE_URL=${VITE_DASHBOARD_API_BASE_URL:-/api}
+      - VITE_LOGIN_URL=${VITE_LOGIN_URL:-/main/login}
+    restart: unless-stopped
+    networks:
+      - default
+    depends_on:
+      - beworking-backend
+
+  beworking-booking:
+    build:
+      context: ../beworking-booking
+      dockerfile: Dockerfile
+    container_name: beworking-booking
+    expose:
+      - "80"
+    environment:
+      - VITE_API_BASE_URL=${VITE_BOOKING_API_BASE_URL:-/api}
+      - VITE_PAYMENTS_BASE_URL=${VITE_PAYMENTS_BASE_URL:-/payments/api}
+      - VITE_STRIPE_PUBLISHABLE_KEY=${VITE_STRIPE_PUBLISHABLE_KEY:-}
+      - VITE_STRIPE_TENANT=${VITE_STRIPE_TENANT:-default}
+      - VITE_LOGIN_URL=${VITE_LOGIN_URL:-/main/login}
+      - VITE_MAPBOX_TOKEN=${VITE_MAPBOX_TOKEN:-}
+      - VITE_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY:-}
+    restart: unless-stopped
+    networks:
+      - default
+    depends_on:
+      - beworking-backend
+
+  beworking-stripe-service:
+    build:
+      context: ../beworking-stripe-service
+      dockerfile: Dockerfile
+    container_name: beworking-stripe-service
+    expose:
+      - "8081"
+    environment:
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - APP_TENANT=${APP_TENANT:-default}
+    restart: unless-stopped
+    networks:
+      - default
+    depends_on:
+      - beworking-backend
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: beworking-nginx
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    networks:
+      - default
+    depends_on:
+      - beworking-backend
+      - beworking-frontend
+      - beworking-dashboard
+      - beworking-booking
+      - beworking-stripe-service
+
+networks:
+  default:
+    driver: bridge

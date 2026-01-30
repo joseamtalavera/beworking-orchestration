@@ -1,0 +1,50 @@
+{
+  "taskRoleArn": "arn:aws:iam::905418223611:role/beworking-ecs-task-role",
+  "family": "beworking-booking-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::905418223611:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "beworking-booking",
+      "image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-booking:main",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "VITE_API_BASE_URL",
+          "value": "/api"
+        },
+        {
+          "name": "VITE_PAYMENTS_BASE_URL",
+          "value": "/payments/api"
+        },
+        {
+          "name": "VITE_LOGIN_URL",
+          "value": "/main/login"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/beworking-booking-task",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}

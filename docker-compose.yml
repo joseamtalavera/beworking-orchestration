@@ -23,6 +23,12 @@ services:
       - APP_CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173,http://localhost:3020,http://localhost:4173
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}  # Provide sk_test... in your env/compose overrides
       - TURNSTILE_SECRET=${TURNSTILE_SECRET}
+      - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
+      - MAIL_USERNAME=${MAIL_USERNAME:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-}
+      - APP_BASE_URL=${APP_BASE_URL:-http://localhost:8080}
+      - APP_FRONTEND_URL=${APP_FRONTEND_URL:-http://localhost:3020}
     volumes:
       - ../beworking-backend-java/src:/app/src
       - ../beworking-backend-java/target:/app/target
@@ -51,6 +57,7 @@ services:
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
       NEXT_PUBLIC_ADMIN_DASHBOARD_URL: http://localhost:5173/admin
       NEXT_PUBLIC_USER_DASHBOARD_URL: http://localhost:5173/user
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
     volumes:
       - ../beworking-frontend:/app
     command: npm run dev
@@ -71,6 +78,45 @@ services:
       - ../beworking-dashboard:/app
       - /app/node_modules
     command: npm run dev -- --host 0.0.0.0 --port 5173
+    networks:
+      - default
+    depends_on:
+      - beworking-backend
+
+  beworking-booking:
+    build:
+      context: ../beworking-booking
+      dockerfile: Dockerfile.dev
+    container_name: beworking-booking
+    ports:
+      - "4173:4173"
+    environment:
+      VITE_API_BASE_URL: http://beworking-backend:8080/api
+      VITE_PAYMENTS_BASE_URL: http://beworking-backend:8080/api
+      VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-}
+      VITE_STRIPE_TENANT: ${VITE_STRIPE_TENANT:-default}
+      VITE_LOGIN_URL: http://localhost:3020/main/login
+      VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN:-}
+      VITE_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+    volumes:
+      - ../beworking-booking:/app
+      - /app/node_modules
+    command: npm run dev -- --host 0.0.0.0 --port 4173
+    networks:
+      - default
+    depends_on:
+      - beworking-backend
+
+  beworking-stripe-service:
+    build:
+      context: ../beworking-stripe-service
+    container_name: beworking-stripe-service
+    ports:
+      - "8081:8081"
+    environment:
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - APP_TENANT=${VITE_STRIPE_TENANT:-default}
     networks:
       - default
     depends_on:

@@ -1,0 +1,50 @@
+{
+  "taskRoleArn": "arn:aws:iam::905418223611:role/beworking-ecs-task-role",
+  "family": "beworking-frontend-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::905418223611:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "beworking-frontend",
+      "image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-frontend:main",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "NEXT_PUBLIC_API_BASE_URL",
+          "value": "/api"
+        },
+        {
+          "name": "NEXT_PUBLIC_ADMIN_DASHBOARD_URL",
+          "value": "/dashboard/admin"
+        },
+        {
+          "name": "NEXT_PUBLIC_USER_DASHBOARD_URL",
+          "value": "/dashboard/user"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/beworking-frontend-task",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}
