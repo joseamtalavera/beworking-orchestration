@@ -92,17 +92,18 @@ services:
     ports:
       - "4173:4173"
     environment:
-      VITE_API_BASE_URL: http://beworking-backend:8080/api
-      VITE_PAYMENTS_BASE_URL: http://beworking-backend:8080/api
-      VITE_STRIPE_PUBLISHABLE_KEY: ${VITE_STRIPE_PUBLISHABLE_KEY:-}
-      VITE_STRIPE_TENANT: ${VITE_STRIPE_TENANT:-default}
-      VITE_LOGIN_URL: http://localhost:3020/main/login
-      VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN:-}
-      VITE_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8080/api
+      NEXT_PUBLIC_PAYMENTS_BASE_URL: http://localhost:8080/api
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
+      NEXT_PUBLIC_STRIPE_TENANT: ${NEXT_PUBLIC_STRIPE_TENANT:-default}
+      NEXT_PUBLIC_LOGIN_URL: http://localhost:3020/main/login
+      NEXT_PUBLIC_MAPBOX_TOKEN: ${NEXT_PUBLIC_MAPBOX_TOKEN:-}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
     volumes:
       - ../beworking-booking:/app
       - /app/node_modules
-    command: npm run dev -- --host 0.0.0.0 --port 4173
+      - /app/.next
+    command: npm run dev
     networks:
       - default
     depends_on:

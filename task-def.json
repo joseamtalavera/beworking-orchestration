@@ -53,6 +53,22 @@
         {
           "name": "TURNSTILE_SECRET",
           "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-turnstile-secret-dI7LJl"
+        },
+        {
+          "name": "MAIL_HOST",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-mail-credentials-nTTIL9:MAIL_HOST::"
+        },
+        {
+          "name": "MAIL_PORT",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-mail-credentials-nTTIL9:MAIL_PORT::"
+        },
+        {
+          "name": "MAIL_USERNAME",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-mail-credentials-nTTIL9:MAIL_USERNAME::"
+        },
+        {
+          "name": "MAIL_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-mail-credentials-nTTIL9:MAIL_PASSWORD::"
         }
       ],
       "logConfiguration": {
