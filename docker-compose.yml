@@ -59,9 +59,10 @@ services:
       NEXT_PUBLIC_ADMIN_DASHBOARD_URL: http://localhost:5173/admin
       NEXT_PUBLIC_USER_DASHBOARD_URL: http://localhost:5173/user
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+      NEXT_PUBLIC_BOOKING_URL: http://localhost:4173
     volumes:
       - ../beworking-frontend:/app
-    command: npm run dev
+    command: sh -lc "npm install && npm run dev"
     networks:
       - default
 
@@ -103,7 +104,7 @@ services:
       - ../beworking-booking:/app
       - /app/node_modules
       - /app/.next
-    command: npm run dev
+    command: sh -lc "npm install && npm run dev"
     networks:
       - default
     depends_on:
