@@ -94,7 +94,7 @@ services:
       - "4173:4173"
     environment:
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8080/api
-      NEXT_PUBLIC_PAYMENTS_BASE_URL: http://localhost:8080/api
+      NEXT_PUBLIC_PAYMENTS_BASE_URL: http://localhost:8081
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
       NEXT_PUBLIC_STRIPE_TENANT: ${NEXT_PUBLIC_STRIPE_TENANT:-default}
       NEXT_PUBLIC_LOGIN_URL: http://localhost:3020/main/login
