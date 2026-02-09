@@ -28,11 +28,11 @@
       "secrets": [
         {
           "name": "STRIPE_SECRET_KEY",
-          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-stripe-secret-key"
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-stripe-secret-key-jSK7v5"
         },
         {
           "name": "STRIPE_WEBHOOK_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-stripe-webhook-secret"
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-stripe-webhook-secret-KAyVNv"
         }
       ],
       "logConfiguration": {
