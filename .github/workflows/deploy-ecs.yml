@@ -1,0 +1,65 @@
+name: Reusable ECS Deploy
+
+on:
+  workflow_call:
+    inputs:
+      aws_region:
+        description: AWS region
+        required: true
+        type: string
+      ecs_cluster:
+        description: ECS cluster name
+        required: true
+        type: string
+      ecs_service:
+        description: ECS service name
+        required: true
+        type: string
+      task_definition_file:
+        description: Path to task definition JSON file in this repo
+        required: true
+        type: string
+      container_name:
+        description: ECS task container name to update
+        required: true
+        type: string
+      image_uri:
+        description: Full ECR image URI including tag
+        required: true
+        type: string
+    secrets:
+      aws_role_to_assume:
+        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.aws_role_to_assume }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: Render ECS task definition
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ inputs.task_definition_file }}
+          container-name: ${{ inputs.container_name }}
+          image: ${{ inputs.image_uri }}
+
+      - name: Deploy ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          service: ${{ inputs.ecs_service }}
+          cluster: ${{ inputs.ecs_cluster }}
+          wait-for-service-stability: true

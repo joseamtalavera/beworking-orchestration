@@ -1,0 +1,93 @@
+name: Manual Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: Service to deploy
+        required: true
+        type: choice
+        options:
+          - backend
+          - frontend
+          - dashboard
+          - booking
+          - stripe
+      image_tag:
+        description: ECR image tag (e.g. main, prod, sha-xxxx)
+        required: true
+        default: main
+        type: string
+      aws_region:
+        description: AWS region
+        required: true
+        default: eu-north-1
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      ecs_service: ${{ steps.map.outputs.ecs_service }}
+      task_definition_file: ${{ steps.map.outputs.task_definition_file }}
+      container_name: ${{ steps.map.outputs.container_name }}
+      ecr_repo: ${{ steps.map.outputs.ecr_repo }}
+    steps:
+      - name: Resolve service mapping
+        id: map
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "${{ inputs.service }}" in
+            backend)
+              echo "ecs_service=beworking-backend-task-service-v2xrc5id" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=task-def.json" >> "$GITHUB_OUTPUT"
+              echo "container_name=beworking-backend" >> "$GITHUB_OUTPUT"
+              echo "ecr_repo=beworking-core" >> "$GITHUB_OUTPUT"
+              ;;
+            frontend)
+              echo "ecs_service=beworking-frontend-service" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=task-def-frontend.json" >> "$GITHUB_OUTPUT"
+              echo "container_name=beworking-frontend" >> "$GITHUB_OUTPUT"
+              echo "ecr_repo=beworking-frontend" >> "$GITHUB_OUTPUT"
+              ;;
+            dashboard)
+              echo "ecs_service=beworking-dashboard-service" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=task-def-dashboard.json" >> "$GITHUB_OUTPUT"
+              echo "container_name=beworking-dashboard" >> "$GITHUB_OUTPUT"
+              echo "ecr_repo=beworking-dashboard" >> "$GITHUB_OUTPUT"
+              ;;
+            booking)
+              echo "ecs_service=beworking-booking-service" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=task-def-booking.json" >> "$GITHUB_OUTPUT"
+              echo "container_name=beworking-booking" >> "$GITHUB_OUTPUT"
+              echo "ecr_repo=beworking-booking" >> "$GITHUB_OUTPUT"
+              ;;
+            stripe)
+              echo "ecs_service=beworking-stripe-service" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=task-def-stripe-service.json" >> "$GITHUB_OUTPUT"
+              echo "container_name=beworking-stripe-service" >> "$GITHUB_OUTPUT"
+              echo "ecr_repo=beworking-stripe-service" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "Unsupported service: ${{ inputs.service }}" >&2
+              exit 1
+              ;;
+          esac
+
+  deploy:
+    needs: resolve
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: ${{ inputs.aws_region }}
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: ${{ needs.resolve.outputs.ecs_service }}
+      task_definition_file: ${{ needs.resolve.outputs.task_definition_file }}
+      container_name: ${{ needs.resolve.outputs.container_name }}
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ inputs.aws_region }}.amazonaws.com/${{ needs.resolve.outputs.ecr_repo }}:${{ inputs.image_tag }}
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
