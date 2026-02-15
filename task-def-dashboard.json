@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "beworking-dashboard",
-      "image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-dashboard:prod",
+      "image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-dashboard:main",
       "essential": true,
       "portMappings": [
         {

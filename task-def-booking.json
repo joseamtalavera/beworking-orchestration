@@ -15,21 +15,25 @@
       "essential": true,
       "portMappings": [
         {
-          "containerPort": 80,
+          "containerPort": 3000,
           "protocol": "tcp"
         }
       ],
       "environment": [
         {
-          "name": "VITE_API_BASE_URL",
+          "name": "HOSTNAME",
+          "value": "0.0.0.0"
+        },
+        {
+          "name": "NEXT_PUBLIC_API_BASE_URL",
           "value": "/api"
         },
         {
-          "name": "VITE_PAYMENTS_BASE_URL",
+          "name": "NEXT_PUBLIC_PAYMENTS_BASE_URL",
           "value": "/payments/api"
         },
         {
-          "name": "VITE_LOGIN_URL",
+          "name": "NEXT_PUBLIC_LOGIN_URL",
           "value": "/main/login"
         }
       ],

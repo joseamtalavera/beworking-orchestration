@@ -30,7 +30,7 @@
         },
         {
           "name": "APP_CORS_ALLOWED_ORIGINS",
-          "value": "https://be-working.com,https://www.be-working.com,https://oficinavirtual.be-working.com"
+          "value": "https://be-working.com,https://www.be-working.com,https://oficinavirtual.be-working.com,https://virtualoffice.be-working.com,https://web.be-working.com,https://booking.be-working.com,https://superapp.be-working.com"
         }
       ],
       "secrets": [
