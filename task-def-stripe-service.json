@@ -22,7 +22,7 @@
       "environment": [
         {
           "name": "APP_TENANT",
-          "value": "default"
+          "value": "beworking"
         }
       ],
       "secrets": [
