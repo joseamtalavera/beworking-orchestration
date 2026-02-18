@@ -1,28 +1,31 @@
-# BeWorking Orchestration Docs
+# BeWorking Documentation
 
-This folder is the documentation hub for the BeWorking stack (backend, landing site, and supporting services).
+## Architecture & Design
 
-## Quick Links
-- Ops runbook (ECS + S3/CloudFront): `deployment/ops-runbook.md`
-- Architecture overview: `architecture/overview.md`
-- API docs: `api/README.md`
-- Database schema: `database/schema.md`
-- Setup guides: `installation/README.md`
-- Security checklist: `security/README.md`
-- Testing guides: `testing/README.md`
+- [Architecture Overview](architecture/overview.md) — system design, tech stack, data flows
+- [Database Schema](database/schema.md) — entities, relationships, migrations
+- [Booking & Payment Architecture](booking-payment-architecture.md) — payment flow design
+- [Stripe Setup](stripe-setup.md) — Stripe integration status
 
-## Process Docs
-- Registration: `processes/registration/README.md`
-- Login: `processes/login/README.md`
-- Mailbox: `processes/mailbox/README.md`
-- Lead intake: `processes/leads/README.md`
-- HubSpot sync: `processes/hubspot-integration/README.md`
+## Development
 
-## Diagrams
-- Keep Draw.io sources in `diagrams/draw.<process>.txt`.
-- Export `.png`/`.svg` snapshots next to the source and reference them from process docs.
+- [Local Setup](installation/general-setup.md) — prerequisites, environment, running the stack
+- [API Reference](api/README.md) — endpoints, Swagger, authentication
+- [Coding Standards](development/coding-standards.md) — conventions and code style
+- [Testing](testing/README.md) — test strategy and CI gates
 
-## Updating Docs
-1. Update the relevant markdown in-place.
-2. Add diagram source + export if the workflow changes.
-3. Keep docs and code changes in the same PR when possible.
+## Deployment & Operations
+
+- [Ops Runbook](deployment/ops-runbook.md) — ECS deployment, secrets, troubleshooting
+
+## Security
+
+- [Security Checklist](security/README.md) — auth, CORS, input validation, HTTPS
+
+## Business Processes
+
+- [Registration](processes/registration/README.md)
+- [Login](processes/login/README.md)
+- [Lead Intake](processes/leads/README.md)
+- [HubSpot Integration](processes/hubspot-integration/README.md)
+- [Mailbox](processes/mailbox/README.md)
