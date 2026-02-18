@@ -1,14 +1,9 @@
 # BeWorking Documentation
 
-## Architecture
+## Reference
 
-- [Architecture Overview](architecture/overview.md) — system design, tech stack, data flows
 - [Database Schema](database/schema.md) — entities, relationships, migrations
-
-## Operations
-
 - [Ops Runbook](deployment/ops-runbook.md) — ECS deployment, secrets, troubleshooting
-- [Security Checklist](security/README.md) — auth, CORS, input validation, HTTPS
 
 ## Business Processes
 

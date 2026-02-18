@@ -102,13 +102,9 @@ docker-compose up
 
 See [docs/](docs/) for detailed documentation:
 
-- [Architecture Overview](docs/architecture/overview.md)
-- [Local Setup Guide](docs/installation/general-setup.md)
-- [Deployment & Operations](docs/deployment/ops-runbook.md)
-- [API Reference](docs/api/README.md)
 - [Database Schema](docs/database/schema.md)
-- [Security](docs/security/README.md)
-- [Coding Standards](docs/development/coding-standards.md)
+- [Deployment & Operations](docs/deployment/ops-runbook.md)
+- [Business Processes](docs/processes/) (registration, login, leads, HubSpot, mailbox)
 
 ## Deployment
 
