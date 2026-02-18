@@ -1,25 +1,128 @@
+# BeWorking
 
-# BeWorking Orchestration
+Multi-tenant workspace management platform for coworking spaces. Handles bookings, invoicing, contacts, mailroom, and payments.
 
-This repository is the documentation and deployment hub for the BeWorking stack. Code lives in sibling folders (backend, landing, dashboards), while this root hosts docs, runbooks, and ECS task definitions.
+## Architecture
 
-## Start Here
-- Documentation index: `docs/README.md`
-- Ops runbook (ECS + S3/CloudFront): `docs/deployment/ops-runbook.md`
-- Backend entrypoint: `../beworking-backend-java/src/main/java/com/beworking/JavaApplication.java`
-- Landing entrypoint: `../beworking-landing-ov/pages/index.js`
+```text
+                         ┌──────────────┐
+                         │    Nginx     │ :80
+                         │ reverse proxy│
+                         └──────┬───────┘
+                ┌───────────────┼───────────────────┐
+                │               │                   │
+        /api/*  │    /*         │   /dashboard/*    │  /booking/*
+                │               │                   │
+        ┌───────▼──┐   ┌───────▼──┐   ┌───────────▼┐   ┌──────────┐
+        │ Backend  │   │ Frontend │   │  Dashboard  │   │ Booking  │
+        │ Java     │   │ Next.js  │   │  Vite+React │   │ Next.js  │
+        │ :8080    │   │ :3000    │   │  :5173      │   │ :4173    │
+        └────┬─────┘   └──────────┘   └──────┬──────┘   └────┬─────┘
+             │                                │               │
+             │                         /payments/*            │
+             │                                │               │
+        ┌────▼─────┐                  ┌───────▼──┐            │
+        │PostgreSQL│                  │  Stripe  │◄───────────┘
+        │  :5432   │                  │  Service │
+        └──────────┘                  │  :8081   │
+                                      └──────────┘
+```
 
-## Local Dev (Stack)
-See `docker-compose.yml` for the docker-compose dev setup (backend, frontend, dashboard, Postgres).
+## Services
 
-For codebase-specific READMEs:
-- Backend: `../beworking-backend-java/README.md`
-- Landing: `../beworking-landing-ov/README.md`
+| Service | Tech | Port | Repository |
+| ------- | ---- | ---- | ---------- |
+| Backend | Spring Boot 3.4, Java 17 | 8080 | `../beworking-backend-java` |
+| Frontend | Next.js 15, React 19 | 3000 | `../beworking-frontend` |
+| Dashboard | Vite, React 19, MUI 7 | 5173 | `../beworking-dashboard` |
+| Booking | Next.js 15, Zustand | 4173 | `../beworking-booking` |
+| Stripe Service | FastAPI, Python 3.11 | 8081 | `../beworking-stripe-service` |
+| Database | PostgreSQL 13 | 5432 | `../db` |
 
-## Security Notes (Auth changes)
-- Backend login now issues short-lived access (15m) and refresh (7d) JWTs via httpOnly, SameSite=Lax cookies (`beworking_access`, `beworking_refresh`).
-- Refresh endpoint: `POST /api/auth/refresh` rotates both cookies; permitted in security config.
-- Token type/tenantId added to JWT claims; unconfirmed users blocked from login.
-- Auth filter accepts Bearer header or access cookie, enforces access token type, and returns 401 on invalid/expired tokens.
-- Frontend login uses `credentials: 'include'`; dashboards call `/api/auth/me` with auto-refresh on 401 (no token in URL/storage).
-- Cookie `secure` flag is configurable via `app.security.cookie-secure` (default true; set false only for local HTTP dev).
+## Quick Start
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Node.js 20+ (for running services standalone)
+- Java 17 (for backend standalone)
+- Python 3.11 (for stripe service standalone)
+
+### 1. Clone repositories
+
+All repos should be siblings under the same parent directory:
+
+```text
+beworking_tenant/
+├── beworking-orchestration/   (this repo)
+├── beworking-backend-java/
+├── beworking-frontend/
+├── beworking-dashboard/
+├── beworking-booking/
+├── beworking-stripe-service/
+├── db/
+└── packages/
+```
+
+### 2. Configure environment
+
+Generate a JWT secret and set required variables:
+
+```bash
+# Generate JWT secret
+openssl rand -base64 48
+
+# Set in your shell (or create .env in this directory)
+export JWT_SECRET=<generated-secret>
+export MAIL_USERNAME=your_email@gmail.com
+export MAIL_PASSWORD=your_app_password
+export TURNSTILE_SECRET=your_turnstile_secret
+```
+
+Each service also has a `.env.example` — see individual repos for service-specific variables.
+
+### 3. Start the stack
+
+```bash
+docker-compose up
+```
+
+### 4. Verify
+
+| Service | URL |
+| ------- | --- |
+| Frontend | http://localhost:3020 |
+| Dashboard | http://localhost:5173 |
+| Booking | http://localhost:4173 |
+| Backend API | http://localhost:8080/api/health |
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| Stripe Service | http://localhost:8081/api/health |
+
+## Documentation
+
+See [docs/](docs/) for detailed documentation:
+
+- [Architecture Overview](docs/architecture/overview.md)
+- [Local Setup Guide](docs/installation/general-setup.md)
+- [Deployment & Operations](docs/deployment/ops-runbook.md)
+- [API Reference](docs/api/README.md)
+- [Database Schema](docs/database/schema.md)
+- [Security](docs/security/README.md)
+- [Coding Standards](docs/development/coding-standards.md)
+
+## Deployment
+
+Production runs on AWS ECS Fargate (eu-north-1) with RDS PostgreSQL and ECR.
+
+CI/CD via GitHub Actions — push to `main` triggers build, push, and deploy for each service.
+
+See [Ops Runbook](docs/deployment/ops-runbook.md) for details.
+
+## Auth
+
+JWT-based authentication with httpOnly cookies:
+
+- Access token: 15 minutes (`beworking_access`)
+- Refresh token: 7 days (`beworking_refresh`)
+- Refresh endpoint: `POST /api/auth/refresh`
+- Cookie `secure` flag configurable via `APP_SECURITY_COOKIE_SECURE`
