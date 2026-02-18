@@ -30,6 +30,7 @@ services:
       - MAIL_PASSWORD=${MAIL_PASSWORD:-}
       - APP_BASE_URL=${APP_BASE_URL:-http://localhost:8080}
       - APP_FRONTEND_URL=${APP_FRONTEND_URL:-http://localhost:3020}
+      - CALLBACK_SECRET=${CALLBACK_SECRET:-}
     volumes:
       - ../beworking-backend-java/src:/app/src
       - ../beworking-backend-java/target:/app/target
@@ -120,6 +121,8 @@ services:
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
       - APP_TENANT=${VITE_STRIPE_TENANT:-default}
+      - BACKEND_CALLBACK_URL=http://beworking-backend-java:8080
+      - CALLBACK_SECRET=${CALLBACK_SECRET:-}
     networks:
       - default
     depends_on:
