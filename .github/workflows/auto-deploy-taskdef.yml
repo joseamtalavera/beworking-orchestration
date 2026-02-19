@@ -1,0 +1,106 @@
+name: Auto Deploy Task Definitions
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'task-def*.json'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.check.outputs.backend }}
+      frontend: ${{ steps.check.outputs.frontend }}
+      dashboard: ${{ steps.check.outputs.dashboard }}
+      booking: ${{ steps.check.outputs.booking }}
+      stripe: ${{ steps.check.outputs.stripe }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed task definitions
+        id: check
+        run: |
+          CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          echo "backend=$(echo "$CHANGED" | grep -qx 'task-def\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "frontend=$(echo "$CHANGED" | grep -qx 'task-def-frontend\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "dashboard=$(echo "$CHANGED" | grep -qx 'task-def-dashboard\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "booking=$(echo "$CHANGED" | grep -qx 'task-def-booking\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "stripe=$(echo "$CHANGED" | grep -qx 'task-def-stripe-service\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  deploy-backend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-backend-task-service-v2xrc5id
+      task_definition_file: task-def.json
+      container_name: beworking-backend
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-core:main
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-frontend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-frontend-service
+      task_definition_file: task-def-frontend.json
+      container_name: beworking-frontend
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-frontend:main
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-dashboard:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.dashboard == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-dashboard-service
+      task_definition_file: task-def-dashboard.json
+      container_name: beworking-dashboard
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-dashboard:main
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-booking:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.booking == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-booking-service
+      task_definition_file: task-def-booking.json
+      container_name: beworking-booking
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-booking:main
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-stripe:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.stripe == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-stripe-service
+      task_definition_file: task-def-stripe-service.json
+      container_name: beworking-stripe-service
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-stripe-service:main
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
