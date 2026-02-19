@@ -73,10 +73,6 @@
         {
           "name": "MAIL_PASSWORD",
           "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-mail-credentials-nTTIL9:MAIL_PASSWORD::"
-        },
-        {
-          "name": "CALLBACK_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-callback-secret"
         }
       ],
       "logConfiguration": {

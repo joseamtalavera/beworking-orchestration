@@ -37,10 +37,6 @@
         {
           "name": "STRIPE_WEBHOOK_SECRET",
           "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-stripe-webhook-secret-KAyVNv"
-        },
-        {
-          "name": "CALLBACK_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-callback-secret"
         }
       ],
       "logConfiguration": {
