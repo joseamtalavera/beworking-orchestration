@@ -37,6 +37,14 @@
         {
           "name": "STRIPE_WEBHOOK_SECRET",
           "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-stripe-webhook-secret-KAyVNv"
+        },
+        {
+          "name": "GT_STRIPE_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:gt-stripe-secret-key-gXQMo3"
+        },
+        {
+          "name": "GT_STRIPE_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:gt-stripe-webhook-secret-zF8Mpa"
         }
       ],
       "logConfiguration": {
