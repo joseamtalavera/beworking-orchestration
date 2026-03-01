@@ -2,3 +2,4 @@ docs/private/
 .DS_Store
 .env
 .env.prod
+CLAUDE.md
