@@ -35,6 +35,14 @@
         {
           "name": "PAYMENTS_BASE_URL",
           "value": "https://stripe.be-working.com"
+        },
+        {
+          "name": "MEDIA_S3_BUCKET",
+          "value": "beworking-uploads-eu"
+        },
+        {
+          "name": "MEDIA_S3_REGION",
+          "value": "eu-north-1"
         }
       ],
       "secrets": [
