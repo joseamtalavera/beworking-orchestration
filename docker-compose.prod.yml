@@ -22,6 +22,7 @@ services:
       - APP_BASE_URL=${APP_BASE_URL:-https://be-working.com}
       - APP_FRONTEND_URL=${APP_FRONTEND_URL:-https://oficinavirtual.be-working.com}
       - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY:-}
+      - STRIPE_SERVICE_URL=${STRIPE_SERVICE_URL:-http://beworking-stripe-service:8081}
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/api/health"]
       interval: 30s

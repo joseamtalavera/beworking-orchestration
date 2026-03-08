@@ -37,6 +37,10 @@
           "value": "https://stripe.be-working.com"
         },
         {
+          "name": "STRIPE_SERVICE_URL",
+          "value": "https://stripe.be-working.com"
+        },
+        {
           "name": "MEDIA_S3_BUCKET",
           "value": "beworking-uploads-eu"
         },
