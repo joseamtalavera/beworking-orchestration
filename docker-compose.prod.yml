@@ -33,29 +33,6 @@ services:
     networks:
       - default
 
-  beworking-frontend:
-    build:
-      context: ../beworking-frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_BASE_URL:-/api}
-        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
-        NEXT_PUBLIC_ADMIN_DASHBOARD_URL: ${NEXT_PUBLIC_ADMIN_DASHBOARD_URL:-/dashboard/admin}
-        NEXT_PUBLIC_USER_DASHBOARD_URL: ${NEXT_PUBLIC_USER_DASHBOARD_URL:-/dashboard/user}
-        NEXT_PUBLIC_BOOKING_URL: ${NEXT_PUBLIC_BOOKING_URL:-/booking}
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:-}
-    container_name: beworking-frontend
-    expose:
-      - "3000"
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-/api}
-      - NEXT_PUBLIC_ADMIN_DASHBOARD_URL=${NEXT_PUBLIC_ADMIN_DASHBOARD_URL:-/dashboard/admin}
-      - NEXT_PUBLIC_USER_DASHBOARD_URL=${NEXT_PUBLIC_USER_DASHBOARD_URL:-/dashboard/user}
-      - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${TURNSTILE_SITE_KEY:-}
-    restart: unless-stopped
-    networks:
-      - default
-
   beworking-dashboard:
     build:
       context: ../beworking-dashboard
@@ -126,7 +103,6 @@ services:
       - default
     depends_on:
       - beworking-backend
-      - beworking-frontend
       - beworking-dashboard
       - beworking-booking
       - beworking-stripe-service

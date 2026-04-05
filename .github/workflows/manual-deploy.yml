@@ -9,7 +9,6 @@ on:
         type: choice
         options:
           - backend
-          - frontend
           - dashboard
           - booking
           - stripe
@@ -48,12 +47,6 @@ jobs:
               echo "task_definition_file=task-def.json" >> "$GITHUB_OUTPUT"
               echo "container_name=beworking-backend" >> "$GITHUB_OUTPUT"
               echo "ecr_repo=beworking-core" >> "$GITHUB_OUTPUT"
-              ;;
-            frontend)
-              echo "ecs_service=beworking-frontend-service" >> "$GITHUB_OUTPUT"
-              echo "task_definition_file=task-def-frontend.json" >> "$GITHUB_OUTPUT"
-              echo "container_name=beworking-frontend" >> "$GITHUB_OUTPUT"
-              echo "ecr_repo=beworking-frontend" >> "$GITHUB_OUTPUT"
               ;;
             dashboard)
               echo "ecs_service=beworking-dashboard-service" >> "$GITHUB_OUTPUT"

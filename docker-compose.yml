@@ -49,24 +49,6 @@ services:
     depends_on:
       - db
 
-  beworking-frontend:
-    build:
-      context: ../beworking-frontend
-    container_name: beworking-frontend
-    ports:
-      - "3020:3000"
-    environment:
-      NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
-      NEXT_PUBLIC_ADMIN_DASHBOARD_URL: http://localhost:5173/admin
-      NEXT_PUBLIC_USER_DASHBOARD_URL: http://localhost:5173/user
-      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
-      NEXT_PUBLIC_BOOKING_URL: http://localhost:4173
-    volumes:
-      - ../beworking-frontend:/app
-    command: sh -lc "npm install && npm run dev"
-    networks:
-      - default
-
   beworking-dashboard:
     build:
       context: ../beworking-dashboard
