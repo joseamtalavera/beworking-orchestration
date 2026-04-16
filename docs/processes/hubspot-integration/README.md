@@ -1,6 +1,6 @@
 # HubSpot Integration Flow
-- **Owner:** _TBD_
-- **Last updated:** 2025-10-01
+- **Owner:** Jose AM Talavera
+- **Last updated:** 2026-04-16
 
 ## Purpose
 Capture the end-to-end integration between the BeWorking lead system and HubSpot, including payload structure, retry strategy, and operational guidance. Mirrors the HubSpot sync diagram from the backend repository.

@@ -1,11 +1,20 @@
-# Ops Runbook (ECS + S3/CloudFront)
+# Ops Runbook (ECS Fargate)
 
-This runbook documents the manual deployment flow for the backend (ECS/Fargate) and the landing site (S3 + CloudFront). Use it when deploying without CI/CD.
+This runbook documents the manual deployment flow for the backend and supporting services on ECS/Fargate. Use it when deploying without CI/CD.
 
 ## Prerequisites
 - AWS CLI v2 configured for `eu-north-1`
 - Docker installed and running
-- Node.js + npm for the landing build
+- Access to ECR registry `905418223611.dkr.ecr.eu-north-1.amazonaws.com`
+
+## Services & Images
+
+| Service | ECR Image | Task Definition | CPU / Memory |
+|---------|-----------|-----------------|--------------|
+| Backend | `beworking-core:main` | `beworking-backend-task` | 512 / 3 GB |
+| Dashboard | `beworking-dashboard:main` | `beworking-dashboard-task` | 256 / 512 MB |
+| Booking | `beworking-booking:main` | `beworking-booking-task` | 256 / 512 MB |
+| Stripe Service | `beworking-stripe-service:main` | `beworking-stripe-service-task` | 256 / 512 MB |
 
 ## Backend: ECS (Fargate)
 
@@ -60,38 +69,15 @@ For logs:
 aws logs tail /ecs/beworking-backend-task --region eu-north-1 --since 30m
 ```
 
-## Landing: S3 + CloudFront
+## Production Domains
 
-### 1) Build the static export
-From `beworking-landing-ov`:
-```bash
-npm ci
-npm run build
-```
-The export output is `out/`.
-
-### 2) Sync to S3
-```bash
-AWS_REGION=eu-north-1
-BUCKET=<TODO-beworking-landing-bucket>
-aws s3 sync ./out s3://$BUCKET/ --delete
-```
-
-### 3) Invalidate CloudFront cache
-```bash
-DISTRIBUTION_ID=<TODO-cloudfront-distribution-id>
-aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
-```
-
-### 4) Verify
-```bash
-curl -I https://oficinavirtual.be-working.com
-```
+| Domain | Purpose |
+|--------|---------|
+| `be-working.com` / `www.be-working.com` | Primary |
+| `app.be-working.com` | App entry |
+| `oficinavirtual.be-working.com` | Dashboard |
+| `stripe.be-working.com` | Stripe payments |
+| `be-spaces.com` / `www.be-spaces.com` | Partner/secondary |
 
 ## One-Time Setup References
 - Backend ECS setup: `backend-aws.md`
-- Landing S3/CloudFront setup: `../beworking-landing-ov/docs/S3-deployment.md`
-
-## TODO / Assumptions
-- TODO: confirm S3 bucket name for landing static assets.
-- TODO: confirm CloudFront distribution ID.

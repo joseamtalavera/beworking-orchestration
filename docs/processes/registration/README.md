@@ -1,6 +1,6 @@
 # Registration Process
-- **Owner:** _TBD_
-- **Last updated:** 2025-10-01
+- **Owner:** Jose AM Talavera
+- **Last updated:** 2026-04-16
 
 ## Purpose
 Document the end-to-end onboarding journey from the moment a user submits registration details through account activation. This write-up mirrors the registration diagram and backs up the implementation inside `beworking-backend-java` and the frontend sign-up flow.
@@ -22,7 +22,7 @@ Document the end-to-end onboarding journey from the moment a user submits regist
 8. **Verification endpoint** consumes the token, marks the user verified, and hands off to login.
 
 ## Systems & Services
-- Frontend: `beworking-frontend/src/components/login/SigninCard.js` captures credentials and surfaces errors.
+- Frontend: booking app (Next.js) serves as the public-facing entry point via nginx catch-all route.
 - Backend controllers: `beworking-backend-java/src/main/java/com/beworking/auth/RegistrationController.java` and `AuthController.java`.
 - Business logic: `RegistrationService`, `UserRepository`, password encoder configuration.
 - Messaging: `UserRegisteredEvent`, `EmailVerificationListener`, `WelcomeFlowListener`.

@@ -1,6 +1,6 @@
 # Lead Intake Process
-- **Owner:** _TBD_
-- **Last updated:** 2025-10-01
+- **Owner:** Jose AM Talavera
+- **Last updated:** 2026-04-16
 
 ## Purpose
 Describe the backend flow for capturing inbound leads, persisting them, and kicking off downstream email and HubSpot sync automation. This documentation aligns with the lead process diagram migrated from the backend repo.

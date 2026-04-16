@@ -1,18 +1,16 @@
 # Mailbox Process
-- **Owner:** _TBD_
-- **Last updated:** 2025-10-02
+- **Owner:** Jose AM Talavera
+- **Last updated:** 2026-04-16
 
 ## Purpose
 Describe how tenant users browse and interact with mailbox threads, how the frontend components coordinate with backend services, and how messages persist and fan out to downstream channels.
 
 ## Frontend Components
-1. **MailboxPage (/mailbox)** – layout shell that wires Redux/React Query providers, loads initial metadata, and mounts child components.
-2. **MailboxList** – fetches paginated threads via `GET /api/mailbox/threads`, renders unread counts, and surfaces selection events.
-3. **MailboxThread** – loads the active conversation with `GET /api/mailbox/threads/<built-in function id>`, handles scrolling, and marks messages as read.
-4. **MailboxComposer** – validates input, applies tenant templates, and posts new replies through `POST /api/mailbox/messages`.
-5. **NotificationBadge** – subscribes to WebSocket/STOMP updates to refresh counts in real time.
+The mailbox UI lives in the dashboard app (Vite + React):
+- **MailboxAdmin** (`beworking-dashboard/src/components/tabs/admin/MailboxAdmin.jsx`) – admin view for managing all mailroom documents.
+- **MailboxUser** (`beworking-dashboard/src/components/tabs/user/MailboxUser.jsx`) – tenant user view for their own documents.
 
-All components share a mailbox store slice so state (selected thread, message cache, composer draft) stays consistent between views.
+State is managed via local React hooks (`useState`) — document lists, filters, loading states, and snackbar notifications. No Redux or global store is used for mailbox.
 
 ## Request Flow
 1. User hits `/mailbox`; `MailboxPage` requests thread summaries (list component).
@@ -52,6 +50,6 @@ All components share a mailbox store slice so state (selected thread, message ca
 - WebSocket disconnects trigger re-authentication on the frontend badge component.
 
 ## Follow-ups
-- [ ] Generate and commit `docs/diagrams/mailbox.drawio.png` after updating the draw.io diagram.
+- [x] Update frontend component references to match dashboard implementation.
 - [ ] Expand NotificationService documentation with retry/backoff strategy.
-- [ ] Add integration tests covering WebSocket unread updates.
+- [ ] Add integration tests covering mailbox API endpoints.
