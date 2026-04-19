@@ -26,15 +26,15 @@
         },
         {
           "name": "NEXT_PUBLIC_API_BASE_URL",
-          "value": "/api"
+          "value": "https://app-staging.be-working.com/api"
         },
         {
           "name": "NEXT_PUBLIC_PAYMENTS_BASE_URL",
-          "value": "/payments/api"
+          "value": "https://stripe-staging.be-working.com/api"
         },
         {
           "name": "NEXT_PUBLIC_LOGIN_URL",
-          "value": "/main/login"
+          "value": "https://app-staging.be-working.com/main/login"
         },
         {
           "name": "NEXT_PUBLIC_FRONTEND_URL",
