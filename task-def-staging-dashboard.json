@@ -1,0 +1,47 @@
+{
+  "taskRoleArn": "arn:aws:iam::905418223611:role/beworking-ecs-task-role",
+  "family": "beworking-staging-dashboard-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::905418223611:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "beworking-staging-dashboard",
+      "image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-dashboard:staging",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 80,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "VITE_API_BASE_URL",
+          "value": "/api"
+        },
+        {
+          "name": "VITE_LOGIN_URL",
+          "value": "/main/login"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/beworking-staging-dashboard-task",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}

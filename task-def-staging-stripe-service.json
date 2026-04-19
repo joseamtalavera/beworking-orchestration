@@ -1,0 +1,65 @@
+{
+  "taskRoleArn": "arn:aws:iam::905418223611:role/beworking-ecs-task-role",
+  "family": "beworking-staging-stripe-service-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::905418223611:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "beworking-staging-stripe-service",
+      "image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-stripe-service:staging",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8081,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "APP_TENANT",
+          "value": "beworking"
+        },
+        {
+          "name": "BACKEND_CALLBACK_URL",
+          "value": "https://staging.be-working.com"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "STRIPE_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/stripe-secret-key-dT9EPq"
+        },
+        {
+          "name": "STRIPE_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/stripe-webhook-secret-7Pl1Wk"
+        },
+        {
+          "name": "GT_STRIPE_SECRET_KEY",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/gt/stripe-secret-key-T2DDOw"
+        },
+        {
+          "name": "GT_STRIPE_WEBHOOK_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/gt/stripe-webhook-secret-DbSPyh"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/beworking-staging-stripe-service-task",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}

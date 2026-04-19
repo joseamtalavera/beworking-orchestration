@@ -1,0 +1,125 @@
+{
+  "taskRoleArn": "arn:aws:iam::905418223611:role/beworking-ecs-task-role",
+  "family": "beworking-staging-backend-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::905418223611:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "beworking-staging-backend",
+      "image": "905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-core:staging",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "DB_URL",
+          "value": "jdbc:postgresql://database-2.c50syq0iyqal.eu-north-1.rds.amazonaws.com:5432/beworking_staging"
+        },
+        {
+          "name": "SPRING_PROFILES_ACTIVE",
+          "value": "prod"
+        },
+        {
+          "name": "APP_CORS_ALLOWED_ORIGINS",
+          "value": "https://staging.be-working.com"
+        },
+        {
+          "name": "APP_BASE_URL",
+          "value": "https://staging.be-working.com"
+        },
+        {
+          "name": "APP_FRONTEND_URL",
+          "value": "https://staging.be-working.com"
+        },
+        {
+          "name": "APP_SECURITY_COOKIE_DOMAIN",
+          "value": "staging.be-working.com"
+        },
+        {
+          "name": "APP_SECURITY_COOKIE_NAME_PREFIX",
+          "value": "beworking_staging"
+        },
+        {
+          "name": "APP_MAIL_FROM",
+          "value": "onboarding@resend.dev"
+        },
+        {
+          "name": "PAYMENTS_BASE_URL",
+          "value": "https://staging.be-working.com/payments"
+        },
+        {
+          "name": "STRIPE_SERVICE_URL",
+          "value": "https://staging.be-working.com/payments"
+        },
+        {
+          "name": "MEDIA_S3_BUCKET",
+          "value": "beworking-uploads-eu"
+        },
+        {
+          "name": "MEDIA_S3_REGION",
+          "value": "eu-north-1"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DB_USERNAME",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/db-313BLL:username::"
+        },
+        {
+          "name": "DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/db-313BLL:password::"
+        },
+        {
+          "name": "JWT_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/jwt-secret-tazRmT"
+        },
+        {
+          "name": "HUBSPOT_API_TOKEN",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-hubspot-token-PY2ggr:HUBSPOT_API_TOKEN::"
+        },
+        {
+          "name": "TURNSTILE_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-turnstile-secret-dI7LJl"
+        },
+        {
+          "name": "MAIL_HOST",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/mail-credentials-ibHsPl:MAIL_HOST::"
+        },
+        {
+          "name": "MAIL_PORT",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/mail-credentials-ibHsPl:MAIL_PORT::"
+        },
+        {
+          "name": "MAIL_USERNAME",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/mail-credentials-ibHsPl:MAIL_USERNAME::"
+        },
+        {
+          "name": "MAIL_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/mail-credentials-ibHsPl:MAIL_PASSWORD::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/beworking-staging-backend-task",
+          "awslogs-region": "eu-north-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      }
+    }
+  ],
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
+}
