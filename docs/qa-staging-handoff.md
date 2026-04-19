@@ -56,7 +56,7 @@ The Stripe integration on staging is **waiting for your test-mode keys**. Placeh
    - Endpoint URL: `https://stripe-staging.be-working.com/api/webhook/stripe`
    - Events to send: `customer.subscription.*`, `invoice.*`, `checkout.*`, `payment_intent.*`
    - After creating, reveal the **Signing secret** (`whsec_...`)
-4. Send the 3 values (publishable, secret, webhook signing secret) to Jose to populate:
+4. Send the 3 values (publishable, secret, webhook signing secret) to Lead engineer to populate:
    - `staging/beworking/stripe-publishable-key`
    - `staging/beworking/stripe-secret-key`
    - `staging/beworking/stripe-webhook-secret`
@@ -81,7 +81,7 @@ For **Globaltechno (GT)** Stripe, repeat with `/api/webhook/stripe-gt` endpoint;
 ## CI/CD — how your reported fixes reach staging
 
 ```
-Jose makes a change → branch: staging
+Lead engineer makes a change → branch: staging
                           │
                           ▼
     GitHub Actions builds :staging image + deploys ECS
@@ -91,7 +91,7 @@ Jose makes a change → branch: staging
                           │
                           ▼  QA verifies
                           │
-        Jose merges staging → main
+        Lead engineer merges staging → main
                           │
                           ▼
     GitHub Actions builds :main image + deploys prod ECS
@@ -105,7 +105,7 @@ Direct pushes to `main` (hotfixes) automatically replay to `staging` within seco
 
 | Limitation | Impact | Plan |
 |---|---|---|
-| Stripe placeholders until you provide test keys | Payment flows 500 | You send keys, Jose pastes them |
+| Stripe placeholders until you provide test keys | Payment flows 500 | You send keys, Lead engineer pastes them |
 | Emails send from `onboarding@resend.dev` | From-address looks like Resend | Optional: verify `staging.be-working.com` domain in Resend later |
 | Same RDS as prod (different database) | Heavy load on staging could nudge prod perf | Keep load reasonable; separate RDS if needed |
 
@@ -123,12 +123,12 @@ Please include:
 Send via (pick whichever channel you prefer):
 - Dedicated Slack channel (to be created)
 - GitHub Issues in the relevant repo
-- Email: jose.molina.talavera@gmail.com
+- Email: info@globaltechno.io
 
 ---
 
 ## Contact
 
-- **Product owner:** Jose Molina — `jose.molina.talavera@gmail.com`
+- **Product owner:** Lead engineer — `info@globaltechno.io`
 - **Platform:** AWS eu-north-1 · ECS Fargate · RDS PostgreSQL 16 · ALB
 - **Business entities:** Beworking Partners (PT — Spain) · Globaltechno (GT)
