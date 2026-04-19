@@ -1,127 +1,134 @@
-# BeWorking Staging — QA Handoff
+# BeWorking Staging — QA Access
 
-Staging environment is a full isolated copy of the BeWorking platform for testing.
-It runs on AWS (same infra as prod) but uses a separate database and separate Stripe/email accounts — nothing you do here touches real customers or real money.
+Everything you need to test the BeWorking platform on staging.
+
+Staging is a full, isolated copy of the production platform (same AWS infra, separate database + Stripe + email sandbox). Nothing you do here affects real customers, real invoices, or real money.
 
 ---
 
 ## URLs
 
-| Area | URL | Notes |
-|---|---|---|
-| Public booking site | https://staging.be-working.com | what end customers see |
-| Dashboard (admin + user) | https://app-staging.be-working.com | login page |
-| Stripe service | https://stripe-staging.be-working.com | internal, used by payments flow |
-| **Swagger API docs** | https://app-staging.be-working.com/swagger-ui.html | interactive API explorer — useful for API/integration testing |
-
-Backend API lives under `https://app-staging.be-working.com/api/*` (same base URL as the dashboard).
+| Area | URL |
+|------|-----|
+| Public booking site | https://staging.be-working.com |
+| Dashboard (admin + user + accountant) | https://app-staging.be-working.com |
+| Backend API base | https://app-staging.be-working.com/api |
+| Swagger API docs | https://app-staging.be-working.com/swagger-ui/index.html |
+| OpenAPI JSON spec | https://app-staging.be-working.com/v3/api-docs |
+| Stripe service | https://stripe-staging.be-working.com |
+| Stripe health | https://stripe-staging.be-working.com/api/health |
+| Backend health | https://app-staging.be-working.com/api/health |
 
 ---
 
 ## Test accounts
 
-All four accounts share the same password: **`Staging2026!`**
+All accounts share the same password: **`Staging2026!`**
 
-| Login | Role | What it's for |
-|---|---|---|
+| Login | Role | Use for |
+|-------|------|---------|
 | `info@codewright.co` | ADMIN | Full admin app — contacts, invoices, bookings, reconciliation, settings |
-| `qa-user@codewright.co` | USER | Realistic user — has active subscription, bookings, invoices. Use to test the user-side app |
-| `qa-newuser@codewright.co` | USER | Empty user — no bookings, no subs. Use to test signup flow / empty states |
+| `qa-user@codewright.co` | USER | User app with realistic data (active subscription, bookings, invoices) |
+| `qa-newuser@codewright.co` | USER | Empty-state user — no bookings, no subs. For signup flow and empty UI |
 | `qa-accountant@codewright.co` | ACCOUNTANT | Read-only invoice view scoped to PT (Spanish entity) |
 
-You can also log in as **any** user in staging — every user has the same password `Staging2026!`. Look up user IDs in the admin app and log in as `staging+<id>@codewright.co`.
+**Log in as any other user:** every user in staging shares `Staging2026!`. Look up a user ID in the admin app (Contacts → click a contact) and log in as `staging+<id>@codewright.co`.
 
 ---
 
-## Creating new users (signup flow)
+## Signup flow
 
-Staging signup works. You can sign up with any email — if you use your own real email, the confirmation email will arrive in your inbox (staging sends via Resend sandbox, `onboarding@resend.dev`).
+You can sign up with any email (use your own real address to receive the confirmation email). Emails come from **`onboarding@resend.dev`** — that's Resend's sandbox sender. Real and deliverable, just not from a @be-working.com address yet.
 
-Once signed up, you can log into the new account and verify the onboarding flow.
+Once signed up, you can log into your new account and verify onboarding UX.
 
 ---
 
-## Stripe — setting up test mode
+## Stripe — you need to set up test-mode keys
 
-The Stripe integration on staging is **waiting for your test-mode keys**. Placeholders are in place; nothing Stripe-dependent will work until they're replaced.
+The Stripe integration on staging is **waiting for your test-mode keys**. Placeholders are in AWS Secrets Manager; nothing Stripe-dependent will work until you replace them.
 
-1. Create (or use your existing) Stripe account with **Test mode** enabled.
-2. From the Stripe dashboard → Developers → API keys, copy:
+1. Go to your Stripe dashboard → enable **Test mode** (toggle top-right)
+2. **Developers → API keys** → copy:
    - Publishable key (`pk_test_...`)
    - Secret key (`sk_test_...`)
-3. Create a webhook endpoint in Stripe:
-   - URL: `https://stripe-staging.be-working.com/api/webhook/stripe`
-   - Events: `customer.subscription.*`, `invoice.*`, `checkout.*`, `payment_intent.*`
-   - Copy the signing secret (`whsec_...`)
-4. Send these 3 values to Jose — they go into AWS Secrets Manager:
-   - `staging/beworking/stripe-secret-key`
+3. **Developers → Webhooks → Add endpoint**:
+   - Endpoint URL: `https://stripe-staging.be-working.com/api/webhook/stripe`
+   - Events to send: `customer.subscription.*`, `invoice.*`, `checkout.*`, `payment_intent.*`
+   - After creating, reveal the **Signing secret** (`whsec_...`)
+4. Send the 3 values (publishable, secret, webhook signing secret) to Jose to populate:
    - `staging/beworking/stripe-publishable-key`
+   - `staging/beworking/stripe-secret-key`
    - `staging/beworking/stripe-webhook-secret`
 
-If you're also testing GT (Globaltechno), repeat for the GT account and populate `staging/gt/stripe-*` secrets.
+For **Globaltechno (GT)** Stripe, repeat with `/api/webhook/stripe-gt` endpoint; values go into `staging/gt/stripe-*` secrets.
 
-Use Stripe's test card numbers: https://docs.stripe.com/testing
-
----
-
-## What data is in staging
-
-- **~1,900 users**, ~1,970 contact profiles, ~400 subscriptions, ~13,000 invoices
-- All emails anonymized: `staging+<id>@codewright.co`, `contact+<id>@codewright.co`, etc.
-- All phone numbers, addresses, credit card data stripped
-- All Stripe IDs invalidated (prefixed `staging_invalid_`) — so no accidental hits on real Stripe data
-- Business data kept: company names, invoice amounts, room catalog, tenant types
+**Test card numbers:** https://docs.stripe.com/testing
 
 ---
 
-## Known limitations on day 1
+## Data in staging
+
+- **~1,900 users**, **1,970 contact profiles**, **400 subscriptions**, **13,000 invoices**
+- All user emails anonymized: `staging+<id>@codewright.co`, `contact+<id>@codewright.co`, etc.
+- All phone numbers, addresses, credit-card data **stripped**
+- All Stripe IDs invalidated (`staging_invalid_*` prefix) — zero risk of hitting real customer subs in Stripe
+- All Holded (invoicing) IDs wiped
+- Business data retained: company names, tenant types, invoice numbers & amounts, room catalog, pricing
+
+---
+
+## CI/CD — how your reported fixes reach staging
+
+```
+Jose makes a change → branch: staging
+                          │
+                          ▼
+    GitHub Actions builds :staging image + deploys ECS
+                          │
+                          ▼  (6–10 min)
+    staging.be-working.com + app-staging.be-working.com + stripe-staging.be-working.com updated
+                          │
+                          ▼  QA verifies
+                          │
+        Jose merges staging → main
+                          │
+                          ▼
+    GitHub Actions builds :main image + deploys prod ECS
+```
+
+Direct pushes to `main` (hotfixes) automatically replay to `staging` within seconds via `sync-staging` workflow, so staging is never behind prod.
+
+---
+
+## Known limitations
 
 | Limitation | Impact | Plan |
 |---|---|---|
-| Stripe placeholders until you provide keys | Payment flows 500 | You provide keys, see above |
-| Emails send from `onboarding@resend.dev` | From-address says Resend, not BeWorking | Will switch to `staging@staging.be-working.com` once domain is verified in Resend |
-| Same RDS as prod (different DB) | Heavy queries on staging could affect prod perf | Keep load reasonable; if it's a problem we move staging to its own RDS |
+| Stripe placeholders until you provide test keys | Payment flows 500 | You send keys, Jose pastes them |
+| Emails send from `onboarding@resend.dev` | From-address looks like Resend | Optional: verify `staging.be-working.com` domain in Resend later |
+| Same RDS as prod (different database) | Heavy load on staging could nudge prod perf | Keep load reasonable; separate RDS if needed |
 
 ---
 
 ## Reporting bugs
 
-1. Include the URL you were on
+Please include:
+1. URL you were on
 2. Steps to reproduce
-3. Screenshot or HAR if possible
-4. The account you were logged in as
+3. Screenshot / HAR / network trace
+4. Which account you were logged in as
 5. Browser + OS
 
-Submit via (pick whichever channel we agreed on):
-- Shared Slack channel
+Send via (pick whichever channel you prefer):
+- Dedicated Slack channel (to be created)
 - GitHub Issues in the relevant repo
-- Email to `jose.molina.talavera@gmail.com`
-
----
-
-## CI/CD: how changes reach staging
-
-```
-Dev makes a change
-       │
-       ▼
- push to branch: staging           → GitHub Actions builds `:staging` image
-       │                             and redeploys staging ECS services
-       ▼
- QA tests on staging               → takes ~6–10 min from push to live
-       │
-       │ (QA approves)
-       ▼
- push staging → main               → GitHub Actions builds `:main` image
-                                     and redeploys prod ECS services
-```
-
-If Jose pushes directly to `main` (hotfix), a separate workflow auto-merges `main` → `staging` within seconds, so staging is never behind prod.
+- Email: jose.molina.talavera@gmail.com
 
 ---
 
 ## Contact
 
-- Product owner: Jose Molina (jose.molina.talavera@gmail.com)
-- Platform: AWS eu-north-1, ECS Fargate, RDS Postgres
-- Region of operations: Spain (business entity PT) + Globaltechno (GT)
+- **Product owner:** Jose Molina — `jose.molina.talavera@gmail.com`
+- **Platform:** AWS eu-north-1 · ECS Fargate · RDS PostgreSQL 16 · ALB
+- **Business entities:** Beworking Partners (PT — Spain) · Globaltechno (GT)
