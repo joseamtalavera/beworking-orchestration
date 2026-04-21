@@ -1,0 +1,40 @@
+name: Deploy CloudFormation Stacks
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'beworking-orchestration/infra/**.yml'
+      - 'beworking-orchestration/infra/**.yaml'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-staging-scaling:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: eu-north-1
+
+      - name: Validate template
+        run: |
+          aws cloudformation validate-template \
+            --template-body file://beworking-orchestration/infra/staging-scaling.yml \
+            --region eu-north-1
+
+      - name: Deploy staging-scaling stack
+        run: |
+          aws cloudformation deploy \
+            --template-file beworking-orchestration/infra/staging-scaling.yml \
+            --stack-name beworking-staging-scaling \
+            --capabilities CAPABILITY_IAM \
+            --no-fail-on-empty-changeset \
+            --region eu-north-1

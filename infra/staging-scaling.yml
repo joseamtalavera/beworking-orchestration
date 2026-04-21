@@ -1,0 +1,137 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Staging ECS services — scheduled scaling (weekday 08:00-20:00 Madrid, off weekends)
+
+Parameters:
+  ClusterName:
+    Type: String
+    Default: beworking-cluster
+  ScaleUpCron:
+    Type: String
+    Default: cron(0 8 ? * MON-FRI *)
+  ScaleDownEveningCron:
+    Type: String
+    Default: cron(0 20 ? * MON-FRI *)
+  ScaleDownWeekendCron:
+    Type: String
+    Default: cron(0 0 ? * SAT,SUN *)
+  Timezone:
+    Type: String
+    Default: Europe/Madrid
+
+Mappings:
+  Services:
+    Backend:
+      Name: beworking-staging-backend-service
+    Stripe:
+      Name: beworking-staging-stripe-service
+    Booking:
+      Name: beworking-staging-booking-service
+    Dashboard:
+      Name: beworking-staging-dashboard-service
+
+Resources:
+
+  BackendScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      ServiceNamespace: ecs
+      ResourceId: !Sub
+        - service/${ClusterName}/${ServiceName}
+        - ServiceName: !FindInMap [Services, Backend, Name]
+      ScalableDimension: ecs:service:DesiredCount
+      MinCapacity: 0
+      MaxCapacity: 1
+      RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScheduledActions:
+        - ScheduledActionName: scale-up-weekday-morning
+          Schedule: !Ref ScaleUpCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
+        - ScheduledActionName: scale-down-weekday-evening
+          Schedule: !Ref ScaleDownEveningCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+        - ScheduledActionName: scale-down-weekend
+          Schedule: !Ref ScaleDownWeekendCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+
+  StripeScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      ServiceNamespace: ecs
+      ResourceId: !Sub
+        - service/${ClusterName}/${ServiceName}
+        - ServiceName: !FindInMap [Services, Stripe, Name]
+      ScalableDimension: ecs:service:DesiredCount
+      MinCapacity: 0
+      MaxCapacity: 1
+      RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScheduledActions:
+        - ScheduledActionName: scale-up-weekday-morning
+          Schedule: !Ref ScaleUpCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
+        - ScheduledActionName: scale-down-weekday-evening
+          Schedule: !Ref ScaleDownEveningCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+        - ScheduledActionName: scale-down-weekend
+          Schedule: !Ref ScaleDownWeekendCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+
+  BookingScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      ServiceNamespace: ecs
+      ResourceId: !Sub
+        - service/${ClusterName}/${ServiceName}
+        - ServiceName: !FindInMap [Services, Booking, Name]
+      ScalableDimension: ecs:service:DesiredCount
+      MinCapacity: 0
+      MaxCapacity: 1
+      RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScheduledActions:
+        - ScheduledActionName: scale-up-weekday-morning
+          Schedule: !Ref ScaleUpCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
+        - ScheduledActionName: scale-down-weekday-evening
+          Schedule: !Ref ScaleDownEveningCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+        - ScheduledActionName: scale-down-weekend
+          Schedule: !Ref ScaleDownWeekendCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+
+  DashboardScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      ServiceNamespace: ecs
+      ResourceId: !Sub
+        - service/${ClusterName}/${ServiceName}
+        - ServiceName: !FindInMap [Services, Dashboard, Name]
+      ScalableDimension: ecs:service:DesiredCount
+      MinCapacity: 0
+      MaxCapacity: 1
+      RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScheduledActions:
+        - ScheduledActionName: scale-up-weekday-morning
+          Schedule: !Ref ScaleUpCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
+        - ScheduledActionName: scale-down-weekday-evening
+          Schedule: !Ref ScaleDownEveningCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+        - ScheduledActionName: scale-down-weekend
+          Schedule: !Ref ScaleDownWeekendCron
+          Timezone: !Ref Timezone
+          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
+
+Outputs:
+  StackPurpose:
+    Description: Controls staging ECS desired count on a weekday 08-20 Madrid schedule
+    Value: !Sub Staging scaling for cluster ${ClusterName}
