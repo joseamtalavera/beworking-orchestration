@@ -88,7 +88,7 @@
         },
         {
           "name": "TURNSTILE_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:beworking-turnstile-secret-dI7LJl"
+          "valueFrom": "arn:aws:secretsmanager:eu-north-1:905418223611:secret:staging/beworking/turnstile-secret-olbgT4"
         },
         {
           "name": "MAIL_HOST",
