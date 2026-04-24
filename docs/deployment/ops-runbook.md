@@ -39,7 +39,7 @@ docker push 905418223611.dkr.ecr.eu-north-1.amazonaws.com/beworking-core:main
 From `beworking-orchestration`:
 ```bash
 aws ecs register-task-definition \
-  --cli-input-json file://task-def.json \
+  --cli-input-json file://aws/production/task-def-backend.json \
   --region eu-north-1
 ```
 Note the revision (e.g., `beworking-backend-task:16`).

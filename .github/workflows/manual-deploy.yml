@@ -44,25 +44,25 @@ jobs:
           case "${{ inputs.service }}" in
             backend)
               echo "ecs_service=beworking-backend-task-service-v2xrc5id" >> "$GITHUB_OUTPUT"
-              echo "task_definition_file=task-def.json" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=aws/production/task-def-backend.json" >> "$GITHUB_OUTPUT"
               echo "container_name=beworking-backend" >> "$GITHUB_OUTPUT"
               echo "ecr_repo=beworking-core" >> "$GITHUB_OUTPUT"
               ;;
             dashboard)
               echo "ecs_service=beworking-dashboard-service" >> "$GITHUB_OUTPUT"
-              echo "task_definition_file=task-def-dashboard.json" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=aws/production/task-def-dashboard.json" >> "$GITHUB_OUTPUT"
               echo "container_name=beworking-dashboard" >> "$GITHUB_OUTPUT"
               echo "ecr_repo=beworking-dashboard" >> "$GITHUB_OUTPUT"
               ;;
             booking)
               echo "ecs_service=beworking-booking-service" >> "$GITHUB_OUTPUT"
-              echo "task_definition_file=task-def-booking.json" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=aws/production/task-def-booking.json" >> "$GITHUB_OUTPUT"
               echo "container_name=beworking-booking" >> "$GITHUB_OUTPUT"
               echo "ecr_repo=beworking-booking" >> "$GITHUB_OUTPUT"
               ;;
             stripe)
               echo "ecs_service=beworking-stripe-service" >> "$GITHUB_OUTPUT"
-              echo "task_definition_file=task-def-stripe-service.json" >> "$GITHUB_OUTPUT"
+              echo "task_definition_file=aws/production/task-def-stripe.json" >> "$GITHUB_OUTPUT"
               echo "container_name=beworking-stripe-service" >> "$GITHUB_OUTPUT"
               echo "ecr_repo=beworking-stripe-service" >> "$GITHUB_OUTPUT"
               ;;
