@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'aws/production/task-def-*.json'
+      - 'aws/staging/task-def-*.json'
 
 permissions:
   id-token: write
@@ -18,6 +19,10 @@ jobs:
       dashboard: ${{ steps.check.outputs.dashboard }}
       booking: ${{ steps.check.outputs.booking }}
       stripe: ${{ steps.check.outputs.stripe }}
+      staging_backend: ${{ steps.check.outputs.staging_backend }}
+      staging_dashboard: ${{ steps.check.outputs.staging_dashboard }}
+      staging_booking: ${{ steps.check.outputs.staging_booking }}
+      staging_stripe: ${{ steps.check.outputs.staging_stripe }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,10 +33,16 @@ jobs:
         id: check
         run: |
           CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          # production
           echo "backend=$(echo "$CHANGED" | grep -qx 'aws/production/task-def-backend\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "dashboard=$(echo "$CHANGED" | grep -qx 'aws/production/task-def-dashboard\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "booking=$(echo "$CHANGED" | grep -qx 'aws/production/task-def-booking\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
           echo "stripe=$(echo "$CHANGED" | grep -qx 'aws/production/task-def-stripe\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          # staging
+          echo "staging_backend=$(echo "$CHANGED" | grep -qx 'aws/staging/task-def-backend\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "staging_dashboard=$(echo "$CHANGED" | grep -qx 'aws/staging/task-def-dashboard\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "staging_booking=$(echo "$CHANGED" | grep -qx 'aws/staging/task-def-booking\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "staging_stripe=$(echo "$CHANGED" | grep -qx 'aws/staging/task-def-stripe\.json' && echo true || echo false)" >> "$GITHUB_OUTPUT"
 
   deploy-backend:
     needs: detect-changes
@@ -86,5 +97,61 @@ jobs:
       task_definition_file: aws/production/task-def-stripe.json
       container_name: beworking-stripe-service
       image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-stripe-service:main
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-staging-backend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.staging_backend == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-staging-backend-service
+      task_definition_file: aws/staging/task-def-backend.json
+      container_name: beworking-staging-backend
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-core:staging
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-staging-dashboard:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.staging_dashboard == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-staging-dashboard-service
+      task_definition_file: aws/staging/task-def-dashboard.json
+      container_name: beworking-staging-dashboard
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-dashboard:staging
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-staging-booking:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.staging_booking == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-staging-booking-service
+      task_definition_file: aws/staging/task-def-booking.json
+      container_name: beworking-staging-booking
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-booking:staging
+    secrets:
+      aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+
+  deploy-staging-stripe:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.staging_stripe == 'true'
+    uses: ./.github/workflows/deploy-ecs.yml
+    with:
+      aws_region: eu-north-1
+      ecs_cluster: ${{ vars.ECS_CLUSTER }}
+      ecs_service: beworking-staging-stripe-service
+      task_definition_file: aws/staging/task-def-stripe.json
+      container_name: beworking-staging-stripe-service
+      image_uri: ${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.eu-north-1.amazonaws.com/beworking-stripe-service:staging
     secrets:
       aws_role_to_assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
