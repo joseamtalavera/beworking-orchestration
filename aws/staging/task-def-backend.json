@@ -53,10 +53,6 @@
           "value": "info@be-working.com"
         },
         {
-          "name": "DEPLOY_AUTOMATION_TEST",
-          "value": "2026-04-24"
-        },
-        {
           "name": "PAYMENTS_BASE_URL",
           "value": "https://stripe-staging.be-working.com"
         },
