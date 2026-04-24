@@ -50,7 +50,7 @@
         },
         {
           "name": "APP_MAIL_FROM",
-          "value": "onboarding@resend.dev"
+          "value": "info@be-working.com"
         },
         {
           "name": "PAYMENTS_BASE_URL",
