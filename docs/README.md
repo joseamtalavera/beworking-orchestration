@@ -4,6 +4,13 @@
 
 - [Database Schema](database/schema.md) — entities, relationships, migrations
 - [Ops Runbook](deployment/ops-runbook.md) — ECS deployment, secrets, troubleshooting
+- [QA Staging Handoff](deployment/qa-staging-handoff.md) — staging verification before promotion
+
+## SDLC
+
+- [SDLC Framework](sdlc/README.md) — the standard lifecycle model for BeWorking and future projects
+- [BeWorking — SDLC](sdlc/beworking.md) — the framework instantiated for this platform
+- [Project template](sdlc/TEMPLATE.md) — blank skeleton to copy for any new project
 
 ## Business Processes
 

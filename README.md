@@ -9,33 +9,31 @@ Multi-tenant workspace management platform for coworking spaces. Handles booking
                          │    Nginx     │ :80
                          │ reverse proxy│
                          └──────┬───────┘
-                ┌───────────────┼───────────────────┐
-                │               │                   │
-        /api/*  │    /*         │   /dashboard/*    │  /booking/*
-                │               │                   │
-        ┌───────▼──┐   ┌───────▼──┐   ┌───────────▼┐   ┌──────────┐
-        │ Backend  │   │ Frontend │   │  Dashboard  │   │ Booking  │
-        │ Java     │   │ Next.js  │   │  Vite+React │   │ Next.js  │
-        │ :8080    │   │ :3000    │   │  :5173      │   │ :4173    │
-        └────┬─────┘   └──────────┘   └──────┬──────┘   └────┬─────┘
-             │                                │               │
-             │                         /payments/*            │
-             │                                │               │
-        ┌────▼─────┐                  ┌───────▼──┐            │
-        │PostgreSQL│                  │  Stripe  │◄───────────┘
-        │  :5432   │                  │  Service │
-        └──────────┘                  │  :8081   │
-                                      └──────────┘
+          ┌──────────┬─────────┼──────────────┐
+          │          │         │              │
+   /api/* │    /*    │  /dashboard/*    /payments/*
+          │          │         │              │
+   ┌──────▼───┐ ┌────▼────┐ ┌──▼────────┐ ┌───▼──────┐
+   │ Backend  │ │ Booking │ │ Dashboard │ │  Stripe  │
+   │ Java     │ │ Next.js │ │ Vite+React│ │  Service │
+   │ :8080    │ │ :4173   │ │ :5173     │ │  :8081   │
+   └────┬─────┘ └─────────┘ └───────────┘ └──────────┘
+        │
+   ┌────▼─────┐
+   │PostgreSQL│
+   │  :5432   │
+   └──────────┘
 ```
+
+`beworking-frontend` is archived (ECS service deleted); the booking app is now the primary site served at `/`.
 
 ## Services
 
 | Service | Tech | Port | Repository |
 | ------- | ---- | ---- | ---------- |
 | Backend | Spring Boot 3.4, Java 17 | 8080 | `../beworking-backend-java` |
-| Frontend | Next.js 15, React 19 | 3000 | `../beworking-frontend` |
+| Booking (primary site) | Next.js 15, Zustand | 4173 | `../beworking-booking` |
 | Dashboard | Vite, React 19, MUI 7 | 5173 | `../beworking-dashboard` |
-| Booking | Next.js 15, Zustand | 4173 | `../beworking-booking` |
 | Stripe Service | FastAPI, Python 3.11 | 8081 | `../beworking-stripe-service` |
 | Database | PostgreSQL 13 | 5432 | `../db` |
 
@@ -56,7 +54,6 @@ All repos should be siblings under the same parent directory:
 beworking_tenant/
 ├── beworking-orchestration/   (this repo)
 ├── beworking-backend-java/
-├── beworking-frontend/
 ├── beworking-dashboard/
 ├── beworking-booking/
 ├── beworking-stripe-service/
@@ -91,9 +88,8 @@ docker-compose up
 
 | Service | URL |
 | ------- | --- |
-| Frontend | http://localhost:3020 |
+| Booking (primary site) | http://localhost:4173 |
 | Dashboard | http://localhost:5173 |
-| Booking | http://localhost:4173 |
 | Backend API | http://localhost:8080/api/health |
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | Stripe Service | http://localhost:8081/api/health |
@@ -102,15 +98,23 @@ docker-compose up
 
 See [docs/](docs/) for detailed documentation:
 
+- [SDLC Framework](docs/sdlc/README.md) — standard lifecycle model for BeWorking & future projects
 - [Database Schema](docs/database/schema.md)
 - [Deployment & Operations](docs/deployment/ops-runbook.md)
+- [QA Staging Handoff](docs/deployment/qa-staging-handoff.md)
 - [Business Processes](docs/processes/) (registration, login, leads, HubSpot, mailbox)
 
 ## Deployment
 
 Production runs on AWS ECS Fargate (eu-north-1) with RDS PostgreSQL and ECR.
 
-CI/CD via GitHub Actions — push to `main` triggers build, push, and deploy for each service.
+Production domains:
+
+- `be-working.com` — booking app (primary site)
+- `app.be-working.com` — dashboard + API
+- `stripe.be-working.com` — stripe-service
+
+CI/CD via GitHub Actions — push to `main` triggers build, push, and deploy for each service. Workflow: push to `staging` first, verify, then ff-merge to `main` for release.
 
 See [Ops Runbook](docs/deployment/ops-runbook.md) for details.
 
