@@ -4,8 +4,8 @@ on:
   push:
     branches: [main]
     paths:
-      - 'beworking-orchestration/infra/**.yml'
-      - 'beworking-orchestration/infra/**.yaml'
+      - 'infra/**.yml'
+      - 'infra/**.yaml'
   workflow_dispatch:
 
 permissions:
@@ -27,13 +27,13 @@ jobs:
       - name: Validate template
         run: |
           aws cloudformation validate-template \
-            --template-body file://beworking-orchestration/infra/staging-scaling.yml \
+            --template-body file://infra/staging-scaling.yml \
             --region eu-north-1
 
       - name: Deploy staging-scaling stack
         run: |
           aws cloudformation deploy \
-            --template-file beworking-orchestration/infra/staging-scaling.yml \
+            --template-file infra/staging-scaling.yml \
             --stack-name beworking-staging-scaling \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset \
