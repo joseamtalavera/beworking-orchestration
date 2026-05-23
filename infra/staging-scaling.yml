@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Staging ECS services — scheduled scaling (Sun-Fri 10:00-22:00 Madrid, off Saturdays)
+Description: Staging ECS services — scheduled scaling (every day 16:00-21:00 Madrid)
 
 Parameters:
   ClusterName:
@@ -7,13 +7,10 @@ Parameters:
     Default: beworking-cluster
   ScaleUpCron:
     Type: String
-    Default: cron(0 10 ? * SUN-FRI *)
-  ScaleDownEveningCron:
+    Default: cron(0 16 * * ? *)
+  ScaleDownCron:
     Type: String
-    Default: cron(0 22 ? * SUN-FRI *)
-  ScaleDownSaturdayCron:
-    Type: String
-    Default: cron(0 0 ? * SAT *)
+    Default: cron(0 21 * * ? *)
   Timezone:
     Type: String
     Default: Europe/Madrid
@@ -43,16 +40,12 @@ Resources:
       MaxCapacity: 1
       RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
       ScheduledActions:
-        - ScheduledActionName: scale-up-weekday-morning
+        - ScheduledActionName: scale-up-daily
           Schedule: !Ref ScaleUpCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
-        - ScheduledActionName: scale-down-weekday-evening
-          Schedule: !Ref ScaleDownEveningCron
-          Timezone: !Ref Timezone
-          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
-        - ScheduledActionName: scale-down-saturday
-          Schedule: !Ref ScaleDownSaturdayCron
+        - ScheduledActionName: scale-down-daily
+          Schedule: !Ref ScaleDownCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
 
@@ -68,16 +61,12 @@ Resources:
       MaxCapacity: 1
       RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
       ScheduledActions:
-        - ScheduledActionName: scale-up-weekday-morning
+        - ScheduledActionName: scale-up-daily
           Schedule: !Ref ScaleUpCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
-        - ScheduledActionName: scale-down-weekday-evening
-          Schedule: !Ref ScaleDownEveningCron
-          Timezone: !Ref Timezone
-          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
-        - ScheduledActionName: scale-down-saturday
-          Schedule: !Ref ScaleDownSaturdayCron
+        - ScheduledActionName: scale-down-daily
+          Schedule: !Ref ScaleDownCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
 
@@ -93,16 +82,12 @@ Resources:
       MaxCapacity: 1
       RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
       ScheduledActions:
-        - ScheduledActionName: scale-up-weekday-morning
+        - ScheduledActionName: scale-up-daily
           Schedule: !Ref ScaleUpCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
-        - ScheduledActionName: scale-down-weekday-evening
-          Schedule: !Ref ScaleDownEveningCron
-          Timezone: !Ref Timezone
-          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
-        - ScheduledActionName: scale-down-saturday
-          Schedule: !Ref ScaleDownSaturdayCron
+        - ScheduledActionName: scale-down-daily
+          Schedule: !Ref ScaleDownCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
 
@@ -118,20 +103,16 @@ Resources:
       MaxCapacity: 1
       RoleARN: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
       ScheduledActions:
-        - ScheduledActionName: scale-up-weekday-morning
+        - ScheduledActionName: scale-up-daily
           Schedule: !Ref ScaleUpCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 1, MaxCapacity: 1 }
-        - ScheduledActionName: scale-down-weekday-evening
-          Schedule: !Ref ScaleDownEveningCron
-          Timezone: !Ref Timezone
-          ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
-        - ScheduledActionName: scale-down-saturday
-          Schedule: !Ref ScaleDownSaturdayCron
+        - ScheduledActionName: scale-down-daily
+          Schedule: !Ref ScaleDownCron
           Timezone: !Ref Timezone
           ScalableTargetAction: { MinCapacity: 0, MaxCapacity: 0 }
 
 Outputs:
   StackPurpose:
-    Description: Controls staging ECS desired count Sun-Fri 10-22 Madrid (Saturdays off)
+    Description: Controls staging ECS desired count daily 16-21 Madrid
     Value: !Sub Staging scaling for cluster ${ClusterName}
