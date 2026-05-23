@@ -30,11 +30,26 @@ jobs:
             --template-body file://infra/staging-scaling.yml \
             --region eu-north-1
 
+      - name: Extract template parameter defaults
+        id: params
+        run: |
+          # CFN's `deploy` reuses previous stored parameter values when not
+          # overridden, ignoring updated template defaults. Read each parameter
+          # default from the YAML and pass it explicitly so changes always apply.
+          SCALE_UP=$(awk '/^  ScaleUpCron:/{f=1;next} f&&/Default:/{sub(/^[^:]*: */,""); print; exit}' infra/staging-scaling.yml)
+          SCALE_DOWN=$(awk '/^  ScaleDownCron:/{f=1;next} f&&/Default:/{sub(/^[^:]*: */,""); print; exit}' infra/staging-scaling.yml)
+          echo "scale_up=$SCALE_UP"   >> "$GITHUB_OUTPUT"
+          echo "scale_down=$SCALE_DOWN" >> "$GITHUB_OUTPUT"
+          echo "Using ScaleUpCron=$SCALE_UP ScaleDownCron=$SCALE_DOWN"
+
       - name: Deploy staging-scaling stack
         run: |
           aws cloudformation deploy \
             --template-file infra/staging-scaling.yml \
             --stack-name beworking-staging-scaling \
+            --parameter-overrides \
+              "ScaleUpCron=${{ steps.params.outputs.scale_up }}" \
+              "ScaleDownCron=${{ steps.params.outputs.scale_down }}" \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset \
             --region eu-north-1
