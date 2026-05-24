@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Staging ECS services — scheduled scaling (every day 16:00-21:00 Madrid)
+Description: Staging ECS services — scheduled scaling (every day 12:00-21:00 Madrid)
 
 Parameters:
   ClusterName:
@@ -7,7 +7,7 @@ Parameters:
     Default: beworking-cluster
   ScaleUpCron:
     Type: String
-    Default: cron(0 16 * * ? *)
+    Default: cron(0 12 * * ? *)
   ScaleDownCron:
     Type: String
     Default: cron(0 21 * * ? *)
@@ -114,5 +114,5 @@ Resources:
 
 Outputs:
   StackPurpose:
-    Description: Controls staging ECS desired count daily 16-21 Madrid
+    Description: Controls staging ECS desired count daily 12-21 Madrid
     Value: !Sub Staging scaling for cluster ${ClusterName}
