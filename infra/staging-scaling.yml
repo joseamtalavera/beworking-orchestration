@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: Staging ECS services — scheduled scaling (every day 12:00-21:00 Madrid)
+Description: Staging ECS services — scheduled scaling (every day 12:00-21:00 Tallinn)
 
 Parameters:
   ClusterName:
@@ -13,7 +13,7 @@ Parameters:
     Default: cron(0 21 * * ? *)
   Timezone:
     Type: String
-    Default: Europe/Madrid
+    Default: Europe/Tallinn
 
 Mappings:
   Services:
@@ -114,5 +114,5 @@ Resources:
 
 Outputs:
   StackPurpose:
-    Description: Controls staging ECS desired count daily 12-21 Madrid
+    Description: Controls staging ECS desired count daily 12-21 Tallinn
     Value: !Sub Staging scaling for cluster ${ClusterName}

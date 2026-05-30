@@ -38,9 +38,11 @@ jobs:
           # default from the YAML and pass it explicitly so changes always apply.
           SCALE_UP=$(awk '/^  ScaleUpCron:/{f=1;next} f&&/Default:/{sub(/^[^:]*: */,""); print; exit}' infra/staging-scaling.yml)
           SCALE_DOWN=$(awk '/^  ScaleDownCron:/{f=1;next} f&&/Default:/{sub(/^[^:]*: */,""); print; exit}' infra/staging-scaling.yml)
-          echo "scale_up=$SCALE_UP"   >> "$GITHUB_OUTPUT"
+          TIMEZONE=$(awk '/^  Timezone:/{f=1;next} f&&/Default:/{sub(/^[^:]*: */,""); print; exit}' infra/staging-scaling.yml)
+          echo "scale_up=$SCALE_UP"     >> "$GITHUB_OUTPUT"
           echo "scale_down=$SCALE_DOWN" >> "$GITHUB_OUTPUT"
-          echo "Using ScaleUpCron=$SCALE_UP ScaleDownCron=$SCALE_DOWN"
+          echo "timezone=$TIMEZONE"     >> "$GITHUB_OUTPUT"
+          echo "Using ScaleUpCron=$SCALE_UP ScaleDownCron=$SCALE_DOWN Timezone=$TIMEZONE"
 
       - name: Deploy staging-scaling stack
         run: |
@@ -50,6 +52,7 @@ jobs:
             --parameter-overrides \
               "ScaleUpCron=${{ steps.params.outputs.scale_up }}" \
               "ScaleDownCron=${{ steps.params.outputs.scale_down }}" \
+              "Timezone=${{ steps.params.outputs.timezone }}" \
             --capabilities CAPABILITY_IAM \
             --no-fail-on-empty-changeset \
             --region eu-north-1
