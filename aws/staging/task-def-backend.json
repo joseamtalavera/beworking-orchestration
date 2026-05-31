@@ -67,6 +67,10 @@
         {
           "name": "MEDIA_S3_REGION",
           "value": "eu-north-1"
+        },
+        {
+          "name": "MAILROOM_S3_BUCKET",
+          "value": "beworking-mailroom-staging-eu"
         }
       ],
       "secrets": [
